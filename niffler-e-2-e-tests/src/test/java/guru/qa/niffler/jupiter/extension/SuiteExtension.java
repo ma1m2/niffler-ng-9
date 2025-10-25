@@ -17,6 +17,7 @@ public interface SuiteExtension extends BeforeAllCallback{
             .getOrComputeIfAbsent(
                     this.getClass(),
                     key -> {//here only first time
+                      beforeSuite(rootContext);
                       return new AutoCloseable()  {
                         @Override
                         public void close() throws Exception{

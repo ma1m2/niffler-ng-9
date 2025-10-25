@@ -51,6 +51,7 @@ public class BrowserExtension implements
 
   @Override
   public void handleAfterEachMethodExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+    doScreenshot();
     throw throwable;
   }
 
