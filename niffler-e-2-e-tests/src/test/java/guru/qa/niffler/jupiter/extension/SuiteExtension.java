@@ -20,7 +20,7 @@ public interface SuiteExtension extends BeforeAllCallback{
                       beforeSuite(rootContext);
                       return new AutoCloseable()  {
                         @Override
-                        public void close() throws Exception{
+                        public void close(){
                           afterSuite();
                         }
                       };

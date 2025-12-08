@@ -44,12 +44,13 @@ public class RegisterPage {
     return new LoginPage();
   }
 
-  @Step("Error Message: Username `{0}` already exists")
+  //@Step("Error Message: Username `{0}` already exists")
   public void checkErrorMessage(){
     //String error = String.format("Username `%s` already exists", username);
     errorMessage.should(visible);
   }
 
+  @Step("Get text error message")
   public String getErrorMessage(){
     return errorMessage.getText();
   }

@@ -58,7 +58,7 @@ public class CategoryExtension implements
   }
 
   @Override
-  public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+  public CategoryJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
     return extensionContext.getStore(NAMESPACE)
             .get(extensionContext.getUniqueId(), CategoryJson.class);
   }
