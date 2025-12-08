@@ -27,7 +27,7 @@ public class SpendingTest {
     final String newDescription = ":)";
 
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-        .doLogin("duck", "12345")
+        .successLogin("duck", "12345")
         .checkThatMainPageLoaded()
         .editSpending(spendJson.description())
         .setNewSpendingDescription(newDescription)

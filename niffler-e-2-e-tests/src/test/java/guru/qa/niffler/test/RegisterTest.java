@@ -31,7 +31,7 @@ public class RegisterTest {
             .submitRegistration()
             .checkCongratulationsMessage()
             .singIn()
-            .doLogin(usernsme, password)
+            .successLogin(usernsme, password)
             .checkThatMainPageStatistics();
   }
 

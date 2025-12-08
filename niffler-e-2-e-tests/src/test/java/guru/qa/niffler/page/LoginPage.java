@@ -14,7 +14,7 @@ public class LoginPage {
 
 
   @Step("Do login")
-  public MainPage doLogin(String username, String password) {
+  public MainPage successLogin(String username, String password) {
     fillLoginPage(username, password);
     return new MainPage();
   }
@@ -36,4 +36,5 @@ public class LoginPage {
   public String getErrorMessage() {
     return errorMessage.getText(); //Bad credentials
   }
+
 }

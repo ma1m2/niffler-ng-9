@@ -18,10 +18,10 @@ public class ProfileTest {
 
   @Test
   @DisplayName("Create new catecory")
-  public void createNewCategory() throws InterruptedException {
+  public void createNewCategory(){
     String category = new Faker().animal().name();
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .doLogin("anna", "12345")
+            .successLogin("anna", "12345")
             .checkThatMainPageLoaded();
 
     System.out.println("New category " + category);
@@ -29,7 +29,6 @@ public class ProfileTest {
             .checkThatItIsProfilePage()
             .addNewCategory(category)
             .checkCategoryExists(category);
-    Thread.sleep(5000);
   }
 
   @Category(
@@ -38,16 +37,15 @@ public class ProfileTest {
   )
   @Test
   @DisplayName("Archived Category is Present In Categories List")
-  void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) throws InterruptedException {
+  void archivedCategoryShouldPresentInCategoriesList(CategoryJson category){
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .doLogin(category.username(), "12345")
+            .successLogin(category.username(), "12345")
             .checkThatMainPageLoaded();
 
     System.out.println("New category " + category.name());
     Selenide.open(CFG.frontUrl()+"profile", ProfilePage.class)
             .checkThatItIsProfilePage()
             .checkArchivedCategoryExists(category.name());
-    Thread.sleep(5000);
   }
 
   @Category(
@@ -58,7 +56,7 @@ public class ProfileTest {
   @DisplayName("Active Category is Present In Categories List")
   void activeCategoryShouldPresentInCategoriesList(CategoryJson category){
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .doLogin(category.username(), "12345")
+            .successLogin(category.username(), "12345")
             .checkThatMainPageLoaded();
 
     System.out.println("New category " + category.name());

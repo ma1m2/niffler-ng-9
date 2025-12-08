@@ -1,13 +1,13 @@
 package guru.qa.niffler.test;
 
-import guru.qa.niffler.jupiter.extension.UsersQueueExtension.StaticUser;
-import guru.qa.niffler.jupiter.extension.UsersQueueExtension.UserType;
-import guru.qa.niffler.jupiter.extension.UsersQueueExtension;
+import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld.StaticUser;
+import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld.UserType;
+import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(UsersQueueExtension.class)
+@ExtendWith(UsersQueueExtensionOld.class)
 //3.2 video 54:50
 public class UsersQueueTest {
 

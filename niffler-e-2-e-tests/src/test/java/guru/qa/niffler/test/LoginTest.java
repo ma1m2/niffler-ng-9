@@ -18,7 +18,7 @@ public class LoginTest {
   @DisplayName("Main Page is displayed after login")
   public void mainPageShouldBeDisplayedAfterSuccessLogin() {
     Selenide.open(CFG.frontUrl(), LoginPage.class)
-        .doLogin("duck", "12345")
+        .successLogin("duck", "12345")
         .checkThatMainPageLoaded();
   }
 
