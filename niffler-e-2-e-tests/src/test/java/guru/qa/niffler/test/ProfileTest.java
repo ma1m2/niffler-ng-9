@@ -4,6 +4,8 @@ import com.codeborne.selenide.Selenide;
 import com.github.javafaker.Faker;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class ProfileTest {
   private static final Config CFG = Config.getInstance();
 
@@ -31,9 +33,11 @@ public class ProfileTest {
             .checkCategoryExists(category);
   }
 
-  @Category(
+  @User(
           username = "anna",
-          archived = true
+          categories = @Category(
+                  archived = true
+          )
   )
   @Test
   @DisplayName("Archived Category is Present In Categories List")
@@ -48,9 +52,11 @@ public class ProfileTest {
             .checkArchivedCategoryExists(category.name());
   }
 
-  @Category(
+  @User(
           username = "anna",
-          archived = false
+          categories = @Category(
+                  archived = false
+          )
   )
   @Test
   @DisplayName("Active Category is Present In Categories List")

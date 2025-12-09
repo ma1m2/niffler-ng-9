@@ -16,7 +16,6 @@ import java.lang.annotation.Target;
 //@ExtendWith({CreateSpendingExtension.class, SpendingResolverExtension.class})//3.1 lesson
 @ExtendWith(SpendingExtension.class)
 public @interface Spending {
-  String username();
   String description();
   double amount();
   CurrencyValues currency() default CurrencyValues.RUB;

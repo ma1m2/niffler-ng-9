@@ -3,6 +3,7 @@ package guru.qa.niffler.test;
 import com.codeborne.selenide.Selenide;
 import com.github.javafaker.Faker;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.RegisterPage;
@@ -10,19 +11,19 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class RegisterTest {
 
   private static final Config CFG = Config.getInstance();
-  Faker faker = new Faker();
   String password = "12345";
 
   @Test
   @DisplayName("Register new user")
   void shouldRegisterNewUser(){
-    var usernsme = faker.name().username();
+    var usernsme = randomUsername();
     System.out.println(usernsme);
 
     Selenide.open(CFG.frontUrl(), LoginPage.class)
@@ -52,7 +53,7 @@ public class RegisterTest {
   @Test
   @DisplayName("Passwords should be equal")
   void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual(){
-    var usernsme = faker.name().username();
+    var usernsme = randomUsername();
     String error = "Passwords should be equal";
 
     Selenide.open(CFG.frontUrl(), LoginPage.class)

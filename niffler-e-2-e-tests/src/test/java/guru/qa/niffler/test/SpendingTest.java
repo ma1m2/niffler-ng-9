@@ -4,24 +4,28 @@ import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
 import guru.qa.niffler.jupiter.annotation.Spending;
+import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.jupiter.extension.BrowserExtension;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(BrowserExtension.class)
+@WebTest
 public class SpendingTest {
 
   private static final Config CFG = Config.getInstance();
 
-  @Spending(
-      username = "duck",
-      amount = 89990.00,
-      description = "Advanced 9 поток!",
-      category = "Обучение"
+  @User(
+          username = "duck",
+          spendings = @Spending(
+                  amount = 89990.00,
+                  description = "Advanced 9 поток!",
+                  category = "Обучение"
+          )
   )
-  @DisableByIssue("4")//4 closed, 5-open
+  @DisableByIssue("5")//4 closed, 5-open
   @Test
   void mainPageShouldBeDisplayedAfterSuccessLogin(SpendJson spendJson) {
     final String newDescription = ":)";

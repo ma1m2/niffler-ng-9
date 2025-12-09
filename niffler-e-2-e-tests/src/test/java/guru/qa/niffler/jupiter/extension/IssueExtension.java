@@ -9,8 +9,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.util.Optional;
 
-
-//3.2 video 26:00
+//3.2 video 26:00, SpendingTest, LoginTest
 public class IssueExtension implements ExecutionCondition {
 
   private final GhApiClient ghApiClient = new GhApiClient();
@@ -32,8 +31,17 @@ public class IssueExtension implements ExecutionCondition {
       );
     }
 
+    String status;
+    if (annotation.isPresent()) {
+      status = ghApiClient.issueState(annotation.get().value());
+    }else {
+      status = "";
+    }
+
+    System.out.println(status);
+
     return annotation.map(
-            byIssue -> "open".equals(ghApiClient.issueState(byIssue.value()))
+            byIssue -> "open".equals(status)//ghApiClient.issueState(byIssue.value())
                     ? ConditionEvaluationResult.disabled("Disabled by issue #" + byIssue.value())
                     : ConditionEvaluationResult.enabled("Issue closed")
     ).orElseGet(
