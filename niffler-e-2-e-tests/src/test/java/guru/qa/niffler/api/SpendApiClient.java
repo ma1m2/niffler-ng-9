@@ -61,10 +61,7 @@ public class SpendApiClient {
     return response.body();
   }
 
-  public List<SpendJson> allSpends(String username,
-                                   CurrencyValues currency,
-                                   String from,
-                                   String to) {
+  public List<SpendJson> allSpends(String username, CurrencyValues currency, String from, String to) {
     final Response<List<SpendJson>> response;
     try {
       response = spendApi.allSpends(username, currency, from, to).execute();
