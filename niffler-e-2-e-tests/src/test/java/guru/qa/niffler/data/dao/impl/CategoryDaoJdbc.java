@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,7 +57,6 @@ public class CategoryDaoJdbc implements CategoryDao {
 
         ps.execute();
 
-        final UUID generatedKey;
         try(ResultSet rs = ps.getResultSet()){
           if(rs.next()){
             CategoryEntity ce = new CategoryEntity();
@@ -69,6 +69,42 @@ public class CategoryDaoJdbc implements CategoryDao {
             return Optional.empty();
           }
         }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String categoryName) {
+    return Optional.empty();
+  }
+
+  @Override
+  public List<CategoryEntity> findAllByUsername(String username) {
+    return List.of();
+  }
+
+  @Override
+  public void deleteCategory(CategoryEntity category) {
+    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
+      try (PreparedStatement ps = connection.prepareStatement(
+              "DELETE FROM category WHERE id = ?")) {
+        ps.setObject(1, category.getId());
+        ps.executeUpdate();
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void deleteCategory(UUID id) {
+    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
+      try (PreparedStatement ps = connection.prepareStatement(
+              "DELETE FROM category WHERE id = ?")) {
+        ps.setObject(1, id);
+        ps.executeUpdate();
       }
     } catch (SQLException e) {
       throw new RuntimeException(e);
