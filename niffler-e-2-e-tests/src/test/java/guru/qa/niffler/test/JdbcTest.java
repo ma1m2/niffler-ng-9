@@ -26,6 +26,24 @@ public class JdbcTest {
   SpendDbClient spendDbClient = new SpendDbClient();
   UsersDbClient usersDbClient = new UsersDbClient();
 
+  @Test
+  void xaTxTest() {
+    UserJson user = usersDbClient.createUser(
+            new UserJson(
+                    null,
+                    "valentin-4",
+                    null,
+                    null,
+                    null,
+                    CurrencyValues.RUB,
+                    null,
+                    null,
+                    null
+            )
+    );
+    System.out.println(user);
+  }
+
   @DisplayName("Transaction saves us from inconsistency DB")//if username null
   @Test
   public void tx_test(){
