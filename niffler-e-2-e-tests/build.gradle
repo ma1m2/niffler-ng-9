@@ -11,6 +11,7 @@ buildscript {
         springCryptoVersion = '6.4.5'
         p6spyVersion = '3.9.1'
         hibernateVersion = '6.6.13.Final'
+        atomikosVersion = '6.0.0'
         kafkaClientsVersion = '4.0.0'
         saajVersion = '3.0.4'
         springDataCommonsVersion = '3.4.4'
@@ -79,6 +80,9 @@ dependencies {
     // DB
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
     testImplementation "org.postgresql:postgresql:${project.ext.postgresDriverVersion}"
+    testImplementation "com.atomikos:transactions-jdbc:${atomikosVersion}"
+    testImplementation "com.atomikos:transactions-jta:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-hibernate4:${atomikosVersion}:jakarta"
     testImplementation "p6spy:p6spy:${p6spyVersion}"
     testImplementation "org.hibernate:hibernate-core:${hibernateVersion}"
     testImplementation "org.springframework.security:spring-security-crypto:${springCryptoVersion}"

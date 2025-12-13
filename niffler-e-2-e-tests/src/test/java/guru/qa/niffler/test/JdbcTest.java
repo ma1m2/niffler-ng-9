@@ -9,6 +9,8 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -18,9 +20,33 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+//@Disabled
 public class JdbcTest {
+
   SpendDbClient spendDbClient = new SpendDbClient();
   UsersDbClient usersDbClient = new UsersDbClient();
+
+  @DisplayName("Transaction saves us from inconsistency DB")//if username null
+  @Test
+  public void tx_test(){
+    SpendJson spendJson = spendDbClient.createSpend(
+            new SpendJson(
+                    null,
+                    new Date(),
+                    new CategoryJson(
+                            null,
+                            "test-tx-name",
+                            "duck",
+                            false
+                    ),
+                    CurrencyValues.RUB,
+                    100.0,
+                    "test tx",
+                    "anna"
+            )
+    );
+    System.out.println(spendJson);
+  }
 
   @Test
   public void daotest() {
@@ -30,7 +56,7 @@ public class JdbcTest {
                     new Date(),
                     new CategoryJson(
                             null,
-                            "test-dao-name-3",
+                            "test-dao-name",
                             "duck",
                             false
                     ),
@@ -68,7 +94,7 @@ public class JdbcTest {
   @Test
   public void deleteSpendByIdTest(){
     // Arrange
-    String idString = "02a94724-d6cf-11f0-b7b0-be6cbb8a0e8e";//duck 22
+    String idString = "a63a98d4-d83c-11f0-936c-364f1644149f";//duck 22
     UUID id = UUID.fromString(idString);
     // Act
     spendDbClient.deleteSpend(id);
@@ -80,7 +106,7 @@ public class JdbcTest {
   @Test
   public void deleteCategoryByIdTest(){
     // Arrange
-    String idString = "55a53e04-d6cc-11f0-a866-be6cbb8a0e8e";//test-dao-name-3 42
+    String idString = "12027716-d83e-11f0-914f-364f1644149f";//test-tx-name 39
     UUID id = UUID.fromString(idString);
     // Act
     spendDbClient.deleteCategory(id);
