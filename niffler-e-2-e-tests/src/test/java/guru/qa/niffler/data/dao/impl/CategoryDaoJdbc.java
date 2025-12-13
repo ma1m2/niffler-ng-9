@@ -16,11 +16,14 @@ import java.util.UUID;
 
 public class CategoryDaoJdbc implements CategoryDao {
 
-  private static final Config CFG = Config.getInstance();
+  private final Connection connection;
+
+  public CategoryDaoJdbc(Connection connection) {
+    this.connection = connection;
+  }
 
   @Override
   public CategoryEntity create(CategoryEntity category) {
-    try(Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try(PreparedStatement ps = connection.prepareStatement(
               "INSERT INTO category (username, name, archived)" +
                       " VALUES (?, ?, ?)",
@@ -41,7 +44,6 @@ public class CategoryDaoJdbc implements CategoryDao {
         }
         category.setId(generatedKey);
         return category;
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -49,7 +51,6 @@ public class CategoryDaoJdbc implements CategoryDao {
 
   @Override
   public Optional<CategoryEntity> findCategoryById(UUID id) {
-    try(Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try(PreparedStatement ps = connection.prepareStatement(
               "SELECT * FROM category WHERE id = ?"
       )){
@@ -69,7 +70,6 @@ public class CategoryDaoJdbc implements CategoryDao {
             return Optional.empty();
           }
         }
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -87,12 +87,10 @@ public class CategoryDaoJdbc implements CategoryDao {
 
   @Override
   public void deleteCategory(CategoryEntity category) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try (PreparedStatement ps = connection.prepareStatement(
               "DELETE FROM category WHERE id = ?")) {
         ps.setObject(1, category.getId());
         ps.executeUpdate();
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -100,12 +98,10 @@ public class CategoryDaoJdbc implements CategoryDao {
 
   @Override
   public void deleteCategory(UUID id) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try (PreparedStatement ps = connection.prepareStatement(
               "DELETE FROM category WHERE id = ?")) {
         ps.setObject(1, id);
         ps.executeUpdate();
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

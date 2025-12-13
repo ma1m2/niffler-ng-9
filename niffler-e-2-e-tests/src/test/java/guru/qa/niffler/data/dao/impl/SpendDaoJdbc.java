@@ -18,11 +18,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class SpendDaoJdbc implements SpendDao {
-  private static final Config CFG = Config.getInstance();
+
+  private final Connection connection;
+
+  public SpendDaoJdbc(Connection connection) {
+    this.connection = connection;
+  }
 
   @Override
   public SpendEntity create(SpendEntity spend) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try (PreparedStatement ps = connection.prepareStatement(
               "INSERT INTO spend (username, spend_date, currency, amount, description, category_id)" +
                       " VALUES (?, ?, ?, ?, ?, ?)",
@@ -46,7 +50,6 @@ public class SpendDaoJdbc implements SpendDao {
         }
         spend.setId(generatedKey);
         return spend;
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -54,7 +57,6 @@ public class SpendDaoJdbc implements SpendDao {
 
   @Override
   public Optional<SpendEntity> findSpendById(UUID id) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl());) {
       try(PreparedStatement ps = connection.prepareStatement("SELECT * FROM spend WHERE id = ?")) {
         ps.setObject(1, id);
         ps.execute();
@@ -71,14 +73,14 @@ public class SpendDaoJdbc implements SpendDao {
           // Получаем category_id из ResultSet
           UUID categoryId = (UUID) rs.getObject("category_id");
           // Загружаем CategoryEntity по categoryId (например, через DAO)
-          Optional<CategoryEntity> category = new CategoryDaoJdbc().findCategoryById(categoryId);
+          Optional<CategoryEntity> category = new CategoryDaoJdbc(connection).findCategoryById(categoryId);
           category.ifPresent(se::setCategory);
             return Optional.of(se);
           }else {
             return Optional.empty();
           }
         }
-      }
+
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -91,12 +93,10 @@ public class SpendDaoJdbc implements SpendDao {
 
   @Override
   public void deleteSpend(SpendEntity spend) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try (PreparedStatement ps = connection.prepareStatement(
               "DELETE FROM spend WHERE id = ?")) {
         ps.setObject(1, spend.getId());
         ps.executeUpdate();
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -104,12 +104,10 @@ public class SpendDaoJdbc implements SpendDao {
 
   @Override
   public void deleteSpend(UUID id) {
-    try (Connection connection = Databases.connection(CFG.spendJdbcUrl())) {
       try (PreparedStatement ps = connection.prepareStatement(
               "DELETE FROM spend WHERE id = ?")) {
         ps.setObject(1, id);
         ps.executeUpdate();
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
