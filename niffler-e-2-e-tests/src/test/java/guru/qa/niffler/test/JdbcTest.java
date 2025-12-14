@@ -27,6 +27,25 @@ public class JdbcTest {
   UsersDbClient usersDbClient = new UsersDbClient();
 
   @Test
+  void springJdbcTest() {
+    UsersDbClient usersDbClient = new UsersDbClient();
+    UserJson user = usersDbClient.createUserSpringJdbc(
+            new UserJson(
+                    null,
+                    "valentin-6",
+                    null,
+                    null,
+                    null,
+                    CurrencyValues.RUB,
+                    null,
+                    null,
+                    null
+            )
+    );
+    System.out.println(user);
+  }
+
+  @Test
   void xaTxTest() {
     UserJson user = usersDbClient.createUser(
             new UserJson(
@@ -54,7 +73,7 @@ public class JdbcTest {
                     new CategoryJson(
                             null,
                             "test-tx-name",
-                            "duck",
+                            "anna",
                             false
                     ),
                     CurrencyValues.RUB,
@@ -112,7 +131,7 @@ public class JdbcTest {
   @Test
   public void deleteSpendByIdTest(){
     // Arrange
-    String idString = "a63a98d4-d83c-11f0-936c-364f1644149f";//duck 22
+    String idString = "02348182-d8fa-11f0-8766-364f1644149f";//duck 22
     UUID id = UUID.fromString(idString);
     // Act
     spendDbClient.deleteSpend(id);
@@ -124,7 +143,7 @@ public class JdbcTest {
   @Test
   public void deleteCategoryByIdTest(){
     // Arrange
-    String idString = "12027716-d83e-11f0-914f-364f1644149f";//test-tx-name 39
+    String idString = "022fb5ee-d8fa-11f0-8766-364f1644149f";//test-tx-name 39
     UUID id = UUID.fromString(idString);
     // Act
     spendDbClient.deleteCategory(id);
