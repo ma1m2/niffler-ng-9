@@ -1,13 +1,14 @@
 package guru.qa.niffler.data.dao.impl;
 
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.UserdataUserDao;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.mapper.UserdataUserEntityRowMapper;
+import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Optional;
@@ -15,20 +16,15 @@ import java.util.UUID;
 
 public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
 
-  private final DataSource dataSource;
-
-  public UserdataUserDaoSpringJdbc(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
+  private static final Config CFG = Config.getInstance();
 
   @Override
   public UserEntity create(UserEntity user) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     KeyHolder kh = new GeneratedKeyHolder();
     jdbcTemplate.update(con -> {
       PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO \"user\" " +
-                      "(username, currency, firstname, surname, photo, photo_small, full_name) " +
+              "INSERT INTO \"user\" (username, currency, firstname, surname, photo, photo_small, full_name) " +
                       "VALUES (?,?,?,?,?,?,?)",
               Statement.RETURN_GENERATED_KEYS
       );
@@ -49,7 +45,7 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
 
   @Override
   public Optional<UserEntity> findById(UUID id) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
     return Optional.ofNullable(
             jdbcTemplate.queryForObject(
                     "SELECT * FROM \"user\" WHERE id = ?",
@@ -61,11 +57,20 @@ public class UserdataUserDaoSpringJdbc implements UserdataUserDao {
 
   @Override
   public Optional<UserEntity> findByUsername(String username) {
-    return Optional.empty();
+    throw new UnsupportedOperationException("The method has not been written yet.");
   }
 
   @Override
   public void delete(UserEntity user) {
+    throw new UnsupportedOperationException("The method has not been written yet.");
+  }
 
+  @Override
+  public void delete(UUID id) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
+    jdbcTemplate.update(
+            "DELETE FROM \"user\" WHERE id = ?",
+            id
+    );
   }
 }

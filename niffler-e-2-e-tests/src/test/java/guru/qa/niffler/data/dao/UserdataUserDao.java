@@ -14,4 +14,5 @@ public interface UserdataUserDao {
   Optional<UserEntity> findByUsername(String username);
 
   void delete(UserEntity user);
+  void delete(UUID id);
 }
