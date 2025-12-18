@@ -1,23 +1,23 @@
 package guru.qa.niffler.data.dao.impl;
 
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.UUID;
+
+import static guru.qa.niffler.data.tpl.Connections.holder;
 
 public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
 
-  private final Connection connection;
-
-  public AuthAuthorityDaoJdbc(Connection connection) {
-    this.connection = connection;
-  }
+  private static final Config CFG = Config.getInstance();
 
   @Override
   public void create(AuthorityEntity... authority) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
             "INSERT INTO \"authority\" (user_id, authority) VALUES (?, ?)",
             PreparedStatement.RETURN_GENERATED_KEYS)) {
       for (AuthorityEntity a : authority) {
@@ -29,6 +29,18 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
       ps.executeBatch();
     } catch (SQLException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void delete(UUID id) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+            "DELETE FROM  \"authority\"  WHERE user_id = ?"
+    )) {
+      ps.setObject(1, id);
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException("Error deleting user with id: " + id, e);
     }
   }
 }

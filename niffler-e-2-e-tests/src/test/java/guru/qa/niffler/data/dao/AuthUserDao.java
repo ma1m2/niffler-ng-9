@@ -9,4 +9,6 @@ public interface AuthUserDao {
   AuthUserEntity create(AuthUserEntity user);
 
   Optional<AuthUserEntity> findById(UUID id);
+
+  void delete(UUID id);
 }
