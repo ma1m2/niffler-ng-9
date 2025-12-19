@@ -79,7 +79,7 @@ public class SpendDbClient {
 
   public void deleteSpend(UUID id) {
     jdbcTxTemplate.execute(() -> {
-              spendDao.deleteSpend(id);
+              spendDao.delete(id);
               return null;
             }
     );
@@ -87,7 +87,7 @@ public class SpendDbClient {
 
   public void deleteSpend(SpendEntity spend) {
     jdbcTxTemplate.execute(() -> {
-              spendDao.deleteSpend(spend);
+              spendDao.delete(spend);
               return null;
             }
     );
@@ -95,7 +95,7 @@ public class SpendDbClient {
 
   public void deleteCategory(UUID id) {
     jdbcTxTemplate.execute(()  -> {
-              categoryDao.deleteCategory(id);
+              categoryDao.delete(id);
               return null;
             }
     );

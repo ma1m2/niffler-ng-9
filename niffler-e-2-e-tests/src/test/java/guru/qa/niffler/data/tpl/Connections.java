@@ -1,16 +1,16 @@
 package guru.qa.niffler.data.tpl;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Connections{
-  private Connections() {
-  }
 
   private static final Map<String, JdbcConnectionHolder> holders = new ConcurrentHashMap<>();
+
+  private Connections() {
+  }
 
   public static JdbcConnectionHolder holder(String jdbcUrl) {
     return holders.computeIfAbsent(
