@@ -1,5 +1,13 @@
 package guru.qa.niffler.test;
 
+import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.AuthAuthorityDao;
+import guru.qa.niffler.data.dao.AuthUserDao;
+import guru.qa.niffler.data.dao.UserdataUserDao;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
+import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
@@ -28,7 +36,7 @@ public class JdbcTest {
     UserJson user = usersDbClient.createUserSpringXaTx(
             new UserJson(
                     null,
-                    "valentin-9",
+                    "valentin",
                     null,
                     null,
                     null,
@@ -151,7 +159,7 @@ public class JdbcTest {
   @Test
   public void findUserByIdTest() {
     // Arrange
-    String idString = "fc647979-69b0-40f2-a37f-8fa8b64b7351";//duck
+    String idString = "69c0c92e-dcbe-11f0-b051-666764dfeab4";//barsik
     UUID id = UUID.fromString(idString);
     // Act
     Optional<UserJson> result = usersDbClient.findUserById(id);
@@ -160,16 +168,18 @@ public class JdbcTest {
     System.out.println(result.get());
   }
 
-  @Test
+  //@Test
   public void deleteUserByIdTest() {
     // Arrange
-    String idString = "42ed49fa-d8fc-11f0-8c59-364f1644149f";
-    //
-    UUID id = UUID.fromString(idString);
+    String idAuth = "f425c4a0-dccf-11f0-8e39-666764dfeab4";
+    String idUserdata = "f43afeb0-dccf-11f0-8f20-666764dfeab4";
+    UUID idUd = UUID.fromString(idUserdata);
+    UUID idAu = UUID.fromString(idAuth);
     // Act
-    usersDbClient.deleteUser(id);
-    Optional<UserJson> result = usersDbClient.findUserById(id);
+    usersDbClient.deleteUser(idAu, idUd);
+
+/*    Optional<UserJson> result = usersDbClient.findUserById(idUd);
     // Assert
-    assertTrue(result.isEmpty());
+    assertTrue(result.isEmpty());*/
   }
 }

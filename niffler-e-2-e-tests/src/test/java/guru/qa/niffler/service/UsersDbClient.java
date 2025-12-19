@@ -65,10 +65,8 @@ public class UsersDbClient {
       return null;
     });
 
-    return UserJson.fromEntity(
-            userdataUserDao.create(UserEntity.fromJson(user)),
-            null
-    );
+    return UserJson.fromEntity(userdataUserDao.create(UserEntity.fromJson(user)), null);
+
   }
 
   public UserJson createUserSpringXaTx(UserJson user) {
@@ -116,15 +114,15 @@ public class UsersDbClient {
     );
   }
 
-  public void deleteUser(UUID id) {
+  public void deleteUser(UUID idAuth, UUID idUserdata) {
     xaTransactionTemplate.execute(() -> {
-      // Удаляем данные пользователя из userdata
-      userdataUserDao.delete(id);
       // Удаляем все роли/авторизации пользователя
-      authAuthorityDao.delete(id);
+      authAuthorityDao.delete(idAuth);
       // Удаляем пользователя из auth
-      authUserDao.delete(id);
+      authUserDao.delete(idAuth);
       return null;
     });
+    // Удаляем данные пользователя из userdata
+    userdataUserDao.delete(idUserdata);
   }
 }

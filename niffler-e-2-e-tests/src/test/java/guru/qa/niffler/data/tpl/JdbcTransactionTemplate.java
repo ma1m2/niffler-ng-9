@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import static java.sql.Connection.*;
 
 public class JdbcTransactionTemplate {
+
   private final JdbcConnectionHolder holder;
   private final AtomicBoolean closeAfterAction = new AtomicBoolean(true);
 
