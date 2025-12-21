@@ -14,6 +14,7 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.service.UsersDbClient;
+import guru.qa.niffler.service.UsersDbRepoClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +32,9 @@ public class JdbcTest {
 
   @Test
   void springJdbcTest() {
-    UsersDbClient usersDbClient = new UsersDbClient();
+    UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
 
-    UserJson user = usersDbClient.createUserSpringXaTx(
+    UserJson user = usersDbRepoClient.createUserSpringXaTx(
             new UserJson(
                     null,
                     "valentin",
@@ -168,11 +169,11 @@ public class JdbcTest {
     System.out.println(result.get());
   }
 
-  //@Test
+  @Test
   public void deleteUserByIdTest() {
     // Arrange
-    String idAuth = "f425c4a0-dccf-11f0-8e39-666764dfeab4";
-    String idUserdata = "f43afeb0-dccf-11f0-8f20-666764dfeab4";
+    String idAuth = "803f3138-de97-11f0-a8fc-666764dfeab4";
+    String idUserdata = "80594f00-de97-11f0-b532-666764dfeab4";
     UUID idUd = UUID.fromString(idUserdata);
     UUID idAu = UUID.fromString(idAuth);
     // Act
