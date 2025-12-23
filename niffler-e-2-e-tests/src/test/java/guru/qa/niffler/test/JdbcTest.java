@@ -17,6 +17,8 @@ import guru.qa.niffler.service.UsersDbClient;
 import guru.qa.niffler.service.UsersDbRepoClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
 import java.util.Optional;
@@ -29,8 +31,20 @@ public class JdbcTest {
 
   SpendDbClient spendDbClient = new SpendDbClient();
   UsersDbClient usersDbClient = new UsersDbClient();
+  static UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
 
-  @Test
+  //video 6.2
+  @ValueSource(strings = {"valentin-4"})//, "valentin-2", "valentin-3"
+  @ParameterizedTest
+  void createUserHibernateTest(String username) {
+    UserJson user = usersDbRepoClient.createUserHibernateXaTx(username, "12345");
+    usersDbRepoClient.addOutcomeInvitation(user, 1);
+    usersDbRepoClient.addIncomeInvitation(user, 1);
+    usersDbRepoClient.addFriend(user, 1);
+    System.out.println(user);
+  }
+
+  //@Test
   void springJdbcTest() {
     UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
 
@@ -172,8 +186,8 @@ public class JdbcTest {
   @Test
   public void deleteUserByIdTest() {
     // Arrange
-    String idAuth = "803f3138-de97-11f0-a8fc-666764dfeab4";
-    String idUserdata = "80594f00-de97-11f0-b532-666764dfeab4";
+    String idAuth = "eebf25f0-d84e-4737-a576-d7d9493d7ae4";
+    String idUserdata = "c0da9c38-7a6a-401f-9cea-897c06b2ec29";
     UUID idUd = UUID.fromString(idUserdata);
     UUID idAu = UUID.fromString(idAuth);
     // Act

@@ -94,4 +94,19 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
       throw new RuntimeException(e);
     }
   }
+
+  @Override
+  public Optional<AuthUserEntity> findByUsername(String username) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public AuthUserEntity update(AuthUserEntity user) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  public void remove(AuthUserEntity user) {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
 }
