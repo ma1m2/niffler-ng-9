@@ -1,13 +1,5 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.test.fake;
 
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.dao.AuthAuthorityDao;
-import guru.qa.niffler.data.dao.AuthUserDao;
-import guru.qa.niffler.data.dao.UserdataUserDao;
-import guru.qa.niffler.data.dao.impl.AuthAuthorityDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.AuthUserDaoSpringJdbc;
-import guru.qa.niffler.data.dao.impl.UserdataUserDaoSpringJdbc;
-import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
@@ -34,10 +26,10 @@ public class JdbcTest {
   static UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
 
   //video 6.2
-  @ValueSource(strings = {"valentin-4"})//, "valentin-2", "valentin-3"
+  @ValueSource(strings = {"valentin-5"})//, "valentin-2", "valentin-3"
   @ParameterizedTest
   void createUserHibernateTest(String username) {
-    UserJson user = usersDbRepoClient.createUserHibernateXaTx(username, "12345");
+    UserJson user = usersDbRepoClient.createUser(username, "12345");
     usersDbRepoClient.addOutcomeInvitation(user, 1);
     usersDbRepoClient.addIncomeInvitation(user, 1);
     usersDbRepoClient.addFriend(user, 1);

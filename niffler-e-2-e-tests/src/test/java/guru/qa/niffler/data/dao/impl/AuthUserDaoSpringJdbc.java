@@ -4,14 +4,12 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthUserDao;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.mapper.AuthUserEntityRowMapper;
-import guru.qa.niffler.data.tpl.DataSources;
+import guru.qa.niffler.data.jdbc.DataSources;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -57,6 +55,22 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
                       "SELECT * FROM \"user\" WHERE id = ?",
                       AuthUserEntityRowMapper.instance,
                       id
+              )
+      );
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public Optional<AuthUserEntity> findByUsername(String username) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(URL));
+    try {
+      return Optional.ofNullable(
+              jdbcTemplate.queryForObject(
+                      "SELECT * FROM \"user\" WHERE username = ?",
+                      AuthUserEntityRowMapper.instance,
+                      username
               )
       );
     } catch (EmptyResultDataAccessException e) {

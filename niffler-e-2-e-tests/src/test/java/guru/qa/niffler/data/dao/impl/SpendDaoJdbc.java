@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
-import static guru.qa.niffler.data.tpl.Connections.holder;
+import static guru.qa.niffler.data.jdbc.Connections.holder;
 
 public class SpendDaoJdbc implements SpendDao {
 
@@ -50,6 +50,30 @@ public class SpendDaoJdbc implements SpendDao {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public SpendEntity update(SpendEntity spend) {
+    try (PreparedStatement ps = holder(URL).connection().prepareStatement(
+            """
+                  UPDATE "spend"
+                    SET spend_date  = ?,
+                        currency    = ?,
+                        amount      = ?,
+                        description = ?
+                    WHERE id = ?
+                """);
+    ) {
+      ps.setDate(1, new java.sql.Date(spend.getSpendDate().getTime()));
+      ps.setString(2, spend.getCurrency().name());
+      ps.setDouble(3, spend.getAmount());
+      ps.setString(4, spend.getDescription());
+      ps.setObject(5, spend.getId());
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    return spend;
   }
 
   @Override

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class SpendDbClient {
+public class SpendDbClient  implements SpendClient{
   private static final Config CFG = Config.getInstance();
 
   private final CategoryDao categoryDao = new CategoryDaoJdbc();
@@ -26,6 +26,7 @@ public class SpendDbClient {
           CFG.spendJdbcUrl()
   );
 
+  @Override
   public SpendJson createSpend(SpendJson spend) {
     return jdbcTxTemplate.execute(() -> {
               SpendEntity spendEntity = SpendEntity.fromJson(spend);
