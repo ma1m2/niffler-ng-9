@@ -25,6 +25,12 @@ public class UserdataUserRepositoryHibernate implements UserdataUserRepository {
   }
 
   @Override
+  public UserEntity update(UserEntity user) {
+    entityManager.joinTransaction();
+    return entityManager.merge(user);
+  }
+
+  @Override
   public Optional<UserEntity> findById(UUID id) {
     return Optional.ofNullable(
             entityManager.find(UserEntity.class, id)

@@ -10,6 +10,8 @@ public interface UserdataUserDao {
 
   UserEntity create(UserEntity user);
 
+  UserEntity update(UserEntity user);
+
   Optional<UserEntity> findById(UUID id);
 
   Optional<UserEntity> findByUsername(String username);

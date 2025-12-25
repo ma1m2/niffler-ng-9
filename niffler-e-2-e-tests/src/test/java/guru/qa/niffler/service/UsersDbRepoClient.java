@@ -20,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Arrays;
 
 //video 6.1-6.2
-public class UsersDbRepoClient {
+public class UsersDbRepoClient implements UsersClient{
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
@@ -32,7 +32,8 @@ public class UsersDbRepoClient {
           CFG.userdataJdbcUrl()
   );
 
-  public UserJson createUserHibernateXaTx(String username, String password) {
+  @Override
+  public UserJson createUser(String username, String password) {
     return xaTransactionTemplate.execute(() -> {
               AuthUserEntity authUser = authUserEntity(username, password);
               authUserRepo.create(authUser);
