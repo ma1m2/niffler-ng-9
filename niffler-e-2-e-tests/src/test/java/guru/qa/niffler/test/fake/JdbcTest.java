@@ -5,8 +5,8 @@ import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendDbClient;
+import guru.qa.niffler.service.UsersDbClientOld;
 import guru.qa.niffler.service.UsersDbClient;
-import guru.qa.niffler.service.UsersDbRepoClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class JdbcTest {
 
   SpendDbClient spendDbClient = new SpendDbClient();
-  UsersDbClient usersDbClient = new UsersDbClient();
-  static UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
+  UsersDbClientOld usersDbClient = new UsersDbClientOld();
+  static UsersDbClient usersDbRepoClient = new UsersDbClient();
 
   //video 6.2
   @ValueSource(strings = {"valentin-5"})//, "valentin-2", "valentin-3"
@@ -38,7 +38,7 @@ public class JdbcTest {
 
   //@Test
   void springJdbcTest() {
-    UsersDbRepoClient usersDbRepoClient = new UsersDbRepoClient();
+    UsersDbClient usersDbRepoClient = new UsersDbClient();
 
     UserJson user = usersDbRepoClient.createUserSpringXaTx(
             new UserJson(
@@ -48,6 +48,7 @@ public class JdbcTest {
                     null,
                     null,
                     CurrencyValues.RUB,
+                    null,
                     null,
                     null,
                     null
