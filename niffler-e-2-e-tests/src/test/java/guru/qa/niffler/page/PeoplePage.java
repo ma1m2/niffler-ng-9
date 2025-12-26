@@ -12,7 +12,8 @@ public class PeoplePage {
 
   public PeoplePage checkInvitationSentToUser(String username) {
     SelenideElement friendRow = peopleTable.$$("tr").find(text(username));
-    friendRow.shouldHave(text("Waiting..."));
+    SelenideElement friendColumn = friendRow.$$("td").get(1);
+    friendColumn.shouldHave(text("Waiting..."));
     return this;
   }
 }
