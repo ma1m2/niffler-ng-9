@@ -9,6 +9,7 @@ import guru.qa.niffler.model.CurrencyValues;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -21,10 +22,13 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jdbc.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class SpendRepositoryJdbc implements SpendRepository {
 
   private final String SPEND_URL = Config.getInstance().spendJdbcUrl();
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public SpendEntity create(SpendEntity spend) {
     final UUID categoryId = spend.getCategory().getId();
@@ -57,6 +61,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     return spend;
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public SpendEntity update(SpendEntity spend) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -83,6 +89,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     return spend;
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public CategoryEntity createCategory(CategoryEntity category) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -104,6 +112,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<CategoryEntity> findCategoryById(UUID id) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -120,11 +130,15 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  //@SuppressWarnings("resource")
   @Override
   public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
     throw new UnsupportedOperationException("Not implemented yet");
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<SpendEntity> findById(UUID id) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -154,6 +168,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -184,6 +200,7 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void remove(SpendEntity spend) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -196,6 +213,7 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void removeCategory(CategoryEntity category) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
@@ -208,6 +226,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final StringBuilder sql = new StringBuilder(
             """
@@ -255,6 +275,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   public CategoryEntity updateCategory(CategoryEntity category) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
@@ -274,6 +296,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     return category;
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             "SELECT * FROM category WHERE username = ? and name = ?"
@@ -290,6 +314,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   public List<CategoryEntity> allCategories(String username) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             "SELECT * FROM category")) {

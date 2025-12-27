@@ -6,8 +6,10 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 //3.2 video 21:00
+@ParametersAreNonnullByDefault
 public interface GhApi {
 
   @GET("repos/ma1m2/teamcity/issues/{issue_number}")

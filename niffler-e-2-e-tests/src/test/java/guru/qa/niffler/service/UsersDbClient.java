@@ -14,15 +14,18 @@ import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.FriendshipStatus;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.utils.RandomDataUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 //video 6.1-6.2
+@ParametersAreNonnullByDefault
 public class UsersDbClient implements UsersClient{
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -35,9 +38,10 @@ public class UsersDbClient implements UsersClient{
           CFG.userdataJdbcUrl()
   );
 
+  @Nonnull
   @Override
   public UserJson createUser(String username, String password) {
-    return xaTransactionTemplate.execute(() -> {
+    return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
               AuthUserEntity authUser = authUserEntity(username, password);
               authUserRepo.create(authUser);
 
@@ -46,9 +50,10 @@ public class UsersDbClient implements UsersClient{
                       null
               );
             }
-    );
+    ));
   }
 
+  @Nonnull
   public List<UserJson> addIncomeInvitation(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
@@ -73,6 +78,7 @@ public class UsersDbClient implements UsersClient{
     return result;
   }
 
+  @Nonnull
   public List<UserJson>  addOutcomeInvitation(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
@@ -97,6 +103,7 @@ public class UsersDbClient implements UsersClient{
     return result;
   }
 
+  @Nonnull
   public List<UserJson>  addFriend(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
@@ -121,8 +128,9 @@ public class UsersDbClient implements UsersClient{
     return result;
   }
 
+  @Nonnull
   public UserJson createUserSpringXaTx(UserJson user) {
-    return xaTransactionTemplate.execute(() -> {
+    return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
               AuthUserEntity authUser = authUserEntity(user);
               authUserRepo.create(authUser);
 
@@ -131,9 +139,10 @@ public class UsersDbClient implements UsersClient{
                       null
               );
             }
-    );
+    ));
   }
 
+  @Nonnull
   private static UserEntity userEntity(String username) {
     UserEntity ue = new UserEntity();
     ue.setUsername(username);
@@ -141,7 +150,7 @@ public class UsersDbClient implements UsersClient{
     return ue;
   }
 
-  private @NotNull AuthUserEntity authUserEntity(String username, String password) {
+  private @Nonnull AuthUserEntity authUserEntity(String username, String password) {
     AuthUserEntity authUser = new AuthUserEntity();
     authUser.setUsername(username);
     authUser.setPassword(pe.encode("12345"));
@@ -160,7 +169,7 @@ public class UsersDbClient implements UsersClient{
     return authUser;
   }
 
-  private @NotNull AuthUserEntity authUserEntity(UserJson user) {
+  private @Nonnull AuthUserEntity authUserEntity(UserJson user) {
     AuthUserEntity authUser = new AuthUserEntity();
     authUser.setUsername(user.username());
     authUser.setPassword(pe.encode("12345"));

@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -20,11 +21,13 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jdbc.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class CategoryDaoSpringJdbc implements CategoryDao {
 
   private static final Config CFG = Config.getInstance();
   private static final String URL = CFG.spendJdbcUrl();
 
+  @Nonnull
   @Override
   public CategoryEntity create(CategoryEntity category) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(URL));
@@ -46,8 +49,9 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     return category;
   }
 
+  @Nonnull
   @Override
-  public @Nonnull CategoryEntity update(CategoryEntity category) {
+  public CategoryEntity update(CategoryEntity category) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(URL));
     jdbcTemplate.update("""
               UPDATE "category"
@@ -62,6 +66,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     return category;
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findCategoryById(UUID id) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(URL));
@@ -78,6 +83,7 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     }
   }
 
+  @Nonnull
   @Override
   public List<CategoryEntity> findAll() {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(URL));
@@ -87,11 +93,13 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
     );
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findByUsernameAndCategoryName(String username, String categoryName) {
     throw new UnsupportedOperationException("The method has not been written yet.");
   }
 
+  @Nonnull
   @Override
   public List<CategoryEntity> findAllByUsername(String username) {
     throw new UnsupportedOperationException("The method has not been written yet.");

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 
 import java.io.ByteArrayInputStream;
 
@@ -24,17 +23,17 @@ public class BrowserExtension implements
         LifecycleMethodExecutionExceptionHandler {
 
   @Override
-  public void afterEach(ExtensionContext context) throws Exception {
-    if(WebDriverRunner.hasWebDriverStarted()){
-      Selenide.closeWebDriver();
-    }
-  }
-
-  @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     SelenideLogger.addListener("Allure-selenide", new AllureSelenide()
             .savePageSource(false)
             .screenshots(false));
+  }
+
+  @Override
+  public void afterEach(ExtensionContext context) throws Exception {
+    if(WebDriverRunner.hasWebDriverStarted()){
+      Selenide.closeWebDriver();
+    }
   }
 
   @Override

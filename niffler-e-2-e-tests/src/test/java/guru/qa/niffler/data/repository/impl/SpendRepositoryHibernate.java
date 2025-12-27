@@ -25,11 +25,13 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jpa.EntityManagers.em;
 
+@ParametersAreNonnullByDefault
 public class SpendRepositoryHibernate implements SpendRepository {
 
   private static final Config CFG = Config.getInstance();
   private final EntityManager entityManager = em(CFG.spendJdbcUrl());
 
+  @Nonnull
   @Override
   public SpendEntity create(SpendEntity spend) {
     entityManager.joinTransaction();
@@ -37,12 +39,14 @@ public class SpendRepositoryHibernate implements SpendRepository {
     return spend;
   }
 
+  @Nonnull
   @Override
   public SpendEntity update(SpendEntity spend) {
     entityManager.joinTransaction();
     return entityManager.merge(spend);
   }
 
+  @Nonnull
   @Override
   public CategoryEntity createCategory(CategoryEntity category) {
     entityManager.joinTransaction();
@@ -50,6 +54,7 @@ public class SpendRepositoryHibernate implements SpendRepository {
     return category;
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findCategoryById(UUID id) {
     return Optional.ofNullable(
@@ -57,11 +62,13 @@ public class SpendRepositoryHibernate implements SpendRepository {
     );
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
+  @Nonnull
   @Override
   public Optional<SpendEntity> findById(UUID id) {
     return Optional.ofNullable(
@@ -69,6 +76,7 @@ public class SpendRepositoryHibernate implements SpendRepository {
     );
   }
 
+  @Nonnull
   @Override
   public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
     try {
@@ -97,6 +105,7 @@ public class SpendRepositoryHibernate implements SpendRepository {
     entityManager.remove(entityManager.contains(category) ? category : entityManager.merge(category));
   }
 
+  @Nonnull
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     final CriteriaQuery<SpendEntity> cq = cb.createQuery(SpendEntity.class);
@@ -120,11 +129,13 @@ public class SpendRepositoryHibernate implements SpendRepository {
     return entityManager.createQuery(cq).getResultList();
   }
 
+  @Nonnull
   public CategoryEntity updateCategory(CategoryEntity category) {
     entityManager.joinTransaction();
     return entityManager.merge(category);
   }
 
+  @Nonnull
   public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
     try {
       return Optional.of(
@@ -138,6 +149,7 @@ public class SpendRepositoryHibernate implements SpendRepository {
     }
   }
 
+  @Nonnull
   public List<CategoryEntity> allCategories(String username) {
     return entityManager.createQuery(
                     "select c from CategoryEntity c where c.username =: username order by c.name asc",
