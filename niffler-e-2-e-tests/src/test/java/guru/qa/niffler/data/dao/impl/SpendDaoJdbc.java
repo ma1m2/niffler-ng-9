@@ -6,6 +6,8 @@ import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,11 +19,14 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jdbc.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class SpendDaoJdbc implements SpendDao {
 
   private static final Config CFG = Config.getInstance();
   private static final String URL = CFG.spendJdbcUrl();
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public SpendEntity create(SpendEntity spend) {
       try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -52,6 +57,8 @@ public class SpendDaoJdbc implements SpendDao {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public SpendEntity update(SpendEntity spend) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -76,6 +83,8 @@ public class SpendDaoJdbc implements SpendDao {
     return spend;
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<SpendEntity> findSpendById(UUID id) {
       try(PreparedStatement ps = holder(URL).connection()
@@ -107,11 +116,15 @@ public class SpendDaoJdbc implements SpendDao {
     }
   }
 
+  @Nonnull
+  //@SuppressWarnings("resource")
   @Override
   public List<SpendEntity> findAllByUsername(String username) {
     throw new UnsupportedOperationException("The method has not been written yet.");
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public List<SpendEntity> findAll() {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -139,6 +152,7 @@ public class SpendDaoJdbc implements SpendDao {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void delete(SpendEntity spend) {
       try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
@@ -150,6 +164,8 @@ public class SpendDaoJdbc implements SpendDao {
     }
   }
 
+
+  @SuppressWarnings("resource")
   @Override
   public void delete(UUID id) {
       try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(

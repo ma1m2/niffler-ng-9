@@ -12,10 +12,14 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 import io.qameta.allure.Step;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+@ParametersAreNonnullByDefault
 public class SpendDbClient  implements SpendClient{
   private static final Config CFG = Config.getInstance();
 
@@ -26,9 +30,10 @@ public class SpendDbClient  implements SpendClient{
           CFG.spendJdbcUrl()
   );
 
+  @Nonnull
   @Override
   public SpendJson createSpend(SpendJson spend) {
-    return jdbcTxTemplate.execute(() -> {
+    return Objects.requireNonNull(jdbcTxTemplate.execute(() -> {
               SpendEntity spendEntity = SpendEntity.fromJson(spend);
               if (spendEntity.getCategory().getId() == null) {
                 CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
@@ -38,12 +43,13 @@ public class SpendDbClient  implements SpendClient{
                       spendDao.create(spendEntity)
               );
             }
-    );
+    ));
   }
 
+  @Nonnull
   @Step("Find category by id")
   public Optional<CategoryJson> findCategoryById(UUID id) {
-    return jdbcTxTemplate.execute(() -> {
+    return Objects.requireNonNull(jdbcTxTemplate.execute(() -> {
               Optional<CategoryEntity> ce = categoryDao.findCategoryById(id);
               if (ce.isPresent()) {
                 CategoryJson category = CategoryJson.fromEntity(ce.get());
@@ -54,11 +60,12 @@ public class SpendDbClient  implements SpendClient{
                 return Optional.empty();
               }
             }
-    );
+    ));
   }
 
+  @Nonnull
   public Optional<SpendJson> findSpendById(UUID id) {
-    return jdbcTxTemplate.execute(() -> {
+    return Objects.requireNonNull(jdbcTxTemplate.execute(() -> {
               Optional<SpendEntity> se = spendDao.findSpendById(id);
               if (se.isPresent()) {
                 System.out.println(SpendJson.fromEntity(se.get()));
@@ -68,14 +75,15 @@ public class SpendDbClient  implements SpendClient{
                 return Optional.empty();
               }
             }
-    );
+    ));
   }
 
+  @Nonnull
   public List<SpendEntity> findSpendsByUsername(String username) {
-    return jdbcTxTemplate.execute(() -> {
+    return Objects.requireNonNull(jdbcTxTemplate.execute(() -> {
               return spendDao.findAllByUsername(username);
             }
-    );
+    ));
   }
 
   public void deleteSpend(UUID id) {

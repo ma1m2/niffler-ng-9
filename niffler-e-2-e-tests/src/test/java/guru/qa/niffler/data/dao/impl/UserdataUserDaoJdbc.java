@@ -6,6 +6,8 @@ import guru.qa.niffler.data.entity.userdata.FriendshipEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,11 +19,14 @@ import java.util.UUID;
 
 import static guru.qa.niffler.data.jdbc.Connections.holder;
 
+@ParametersAreNonnullByDefault
 public class UserdataUserDaoJdbc implements UserdataUserDao {
 
   private static final Config CFG = Config.getInstance();
   private static final String URL = CFG.userdataJdbcUrl();
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public UserEntity create(UserEntity user) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -46,6 +51,8 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public UserEntity update(UserEntity user) {
     try (PreparedStatement usersPs = holder(URL).connection().prepareStatement(
@@ -90,6 +97,8 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     return user;
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<UserEntity> findById(UUID id) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement("SELECT * FROM \"user\" WHERE id = ? ")) {
@@ -116,6 +125,8 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public Optional<UserEntity> findByUsername(String username) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -143,6 +154,8 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     return Optional.empty();
   }
 
+  @Nonnull
+  @SuppressWarnings("resource")
   @Override
   public List<UserEntity> findAll() {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -169,6 +182,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void delete(UserEntity user) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(
@@ -181,6 +195,7 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void delete(UUID id) {
     try (PreparedStatement ps = holder(URL).connection().prepareStatement(

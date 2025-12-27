@@ -13,7 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Collections;
@@ -24,10 +26,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@ParametersAreNonnullByDefault
 public class SpendRepositorySpringJdbc implements SpendRepository {
 
   private final String SPEND_URL = Config.getInstance().spendJdbcUrl();
 
+  @Nonnull
   @Override
   public SpendEntity create(SpendEntity spend) {
     final UUID categoryId = spend.getCategory().getId();
@@ -55,11 +59,12 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
       return ps;
     }, kh);
 
-    final UUID generatedKey = (UUID) kh.getKeys().get("id");
+    final UUID generatedKey = (UUID) Objects.requireNonNull(kh.getKeys()).get("id");
     spend.setId(generatedKey);
     return spend;
   }
 
+  @Nonnull
   @Override
   public SpendEntity update(SpendEntity spend) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -83,6 +88,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     return spend;
   }
 
+  @Nonnull
   @Override
   public CategoryEntity createCategory(CategoryEntity category) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -101,11 +107,12 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
       return ps;
     }, kh);
 
-    final UUID generatedKey = (UUID) kh.getKeys().get("id");
+    final UUID generatedKey = (UUID) Objects.requireNonNull(kh.getKeys()).get("id");
     category.setId(generatedKey);
     return category;
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findCategoryById(UUID id) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -124,11 +131,13 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
   @Override
   public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
     return Optional.empty();
   }
 
+  @Nonnull
   @Override
   public Optional<SpendEntity> findById(UUID id) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -156,6 +165,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
             : Optional.of(result.getFirst());
   }
 
+  @Nonnull
   @Override
   public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -184,6 +194,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
             : Optional.of(result.getFirst());
   }
 
+  @Nonnull
   @Override
   public void remove(SpendEntity spend) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
@@ -196,6 +207,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     jdbcTemplate.update("DELETE FROM category WHERE id = ?", category.getId());
   }
 
+  @Nonnull
   public CategoryEntity updateCategory(CategoryEntity category) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
     jdbcTemplate.update(
@@ -212,6 +224,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     return category;
   }
 
+  @Nonnull
   public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
     try {
@@ -230,6 +243,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     }
   }
 
+  @Nonnull
   public List<CategoryEntity> allCategories(String username) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
     return jdbcTemplate.query(
@@ -240,6 +254,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
     );
   }
 
+  @Nonnull
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final StringBuilder sql = new StringBuilder(
             """

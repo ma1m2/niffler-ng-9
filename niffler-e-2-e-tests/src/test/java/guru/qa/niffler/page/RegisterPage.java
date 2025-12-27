@@ -3,9 +3,13 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
+@ParametersAreNonnullByDefault
 public class RegisterPage {
   private final SelenideElement usernameInput = $("input[name='username']");
   private final SelenideElement passwordInput = $("input[name='password']");
@@ -18,6 +22,7 @@ public class RegisterPage {
   //Username `max` already exists
   //'Passwords should be equal'
 
+  @Nonnull
   @Step("Fill username {0}, password {1}, submit password {1}")
   public RegisterPage fillRegisterForm(String username,String password, String passwordSubmit){
     usernameInput.setValue(username);
@@ -26,18 +31,21 @@ public class RegisterPage {
     return this;
   }
 
+  @Nonnull
   @Step("Submit registration")
   public RegisterPage submitRegistration(){
     submitButton.click();
     return this;
   }
 
+  @Nonnull
   @Step("Check congratulations message")
   public RegisterPage checkCongratulationsMessage(){
     congratulationsMessage.should(visible);
     return this;
   }
 
+  @Nonnull
   @Step("Sing In")
   public LoginPage singIn(){
     singInButton.click();
@@ -50,6 +58,7 @@ public class RegisterPage {
     errorMessage.should(visible);
   }
 
+  @Nonnull
   @Step("Get text error message")
   public String getErrorMessage(){
     return errorMessage.getText();

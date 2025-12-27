@@ -15,17 +15,27 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.CriteriaUpdate;
 import jakarta.persistence.metamodel.Metamodel;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Decorator for EntityManager.
+ * Since EntityManager is not thread-safe by specification,
+ * this decorator ensures separation of EntityManagers between threads.
+ * So that each thread interacts with its own EntityManager instance.
+ */
+
+@SuppressWarnings("resource")
 public class ThreadSafeEntityManager implements EntityManager {
 
   private final ThreadLocal<EntityManager> theadEm = new ThreadLocal<>();
   private final EntityManagerFactory emf;
 
-  public ThreadSafeEntityManager(EntityManager deligate) {
-    theadEm.set(deligate);
-    emf = deligate.getEntityManagerFactory();
+  public ThreadSafeEntityManager(@Nonnull EntityManager delegate) {
+    theadEm.set(delegate);
+    emf = delegate.getEntityManagerFactory();
   }
 
   private EntityManager threadEm(){
