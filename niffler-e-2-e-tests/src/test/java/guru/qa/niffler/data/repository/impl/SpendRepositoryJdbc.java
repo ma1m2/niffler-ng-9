@@ -39,9 +39,9 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
-                      INSERT INTO "spend" (username, spend_date, currency, amount, description, category_id)
-                      VALUES ( ?, ?, ?, ?, ?, ?)
-                    """,
+                  INSERT INTO "spend" (username, spend_date, currency, amount, description, category_id)
+                  VALUES ( ?, ?, ?, ?, ?, ?)
+                """,
             Statement.RETURN_GENERATED_KEYS
     )) {
       ps.setString(1, spend.getUsername());
@@ -67,14 +67,14 @@ public class SpendRepositoryJdbc implements SpendRepository {
   public SpendEntity update(SpendEntity spend) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
-                      UPDATE "spend"
-                        SET spend_date  = ?,
-                            currency    = ?,
-                            amount      = ?,
-                            description = ?,
-                            category_id = ?
-                        WHERE id = ?
-                    """);
+                  UPDATE "spend"
+                    SET spend_date  = ?,
+                        currency    = ?,
+                        amount      = ?,
+                        description = ?,
+                        category_id = ?
+                    WHERE id = ?
+                """);
     ) {
       ps.setDate(1, new java.sql.Date(spend.getSpendDate().getTime()));
       ps.setString(2, spend.getCurrency().name());
@@ -90,72 +90,23 @@ public class SpendRepositoryJdbc implements SpendRepository {
   }
 
   @Nonnull
-  @SuppressWarnings("resource")
-  @Override
-  public CategoryEntity createCategory(CategoryEntity category) {
-    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
-            "INSERT INTO category (username, name, archived) " +
-                    "VALUES (?, ?, ?)",
-            Statement.RETURN_GENERATED_KEYS
-    )) {
-      ps.setString(1, category.getUsername());
-      ps.setString(2, category.getName());
-      ps.setBoolean(3, category.isArchived());
-
-      ps.executeUpdate();
-
-      final UUID generatedKey = extractIdFromStatement(ps);
-      category.setId(generatedKey);
-      return category;
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Nonnull
-  @SuppressWarnings("resource")
-  @Override
-  public Optional<CategoryEntity> findCategoryById(UUID id) {
-    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
-            "SELECT * FROM category WHERE id = ?"
-    )) {
-      ps.setObject(1, id);
-      ps.execute();
-      final List<CategoryEntity> category = mapStatementToCategory(ps);
-      return category.isEmpty()
-              ? Optional.empty()
-              : Optional.of(category.getFirst());
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @Nonnull
-  //@SuppressWarnings("resource")
-  @Override
-  public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
-    throw new UnsupportedOperationException("Not implemented yet");
-  }
-
-  @Nonnull
-  @SuppressWarnings("resource")
   @Override
   public Optional<SpendEntity> findById(UUID id) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
-                       select
-                       c.id as category_id,
-                       c.name as category_name,
-                       c.archived as category_archived,
-                       s.id,
-                       s.username,
-                       s.spend_date,
-                       s.currency,
-                       s.amount,
-                       s.description
-                       from spend s join category c on s.category_id = c.id
-                       where s.id = ? order by s.spend_date desc
-                    """
+                   select
+                   c.id as category_id,
+                   c.name as category_name,
+                   c.archived as category_archived,
+                   s.id,
+                   s.username,
+                   s.spend_date,
+                   s.currency,
+                   s.amount,
+                   s.description
+                   from spend s join category c on s.category_id = c.id
+                   where s.id = ? order by s.spend_date desc
+                """
     )) {
       ps.setObject(1, id);
       ps.execute();
@@ -174,19 +125,19 @@ public class SpendRepositoryJdbc implements SpendRepository {
   public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
-                       select
-                       c.id as category_id,
-                       c.name as category_name,
-                       c.archived as category_archived,
-                       s.id,
-                       s.username,
-                       s.spend_date,
-                       s.currency,
-                       s.amount,
-                       s.description
-                       from spend s join category c on s.category_id = c.id
-                       where s.username = ? and s.description = ? order by s.spend_date desc
-                    """
+                   select
+                   c.id as category_id,
+                   c.name as category_name,
+                   c.archived as category_archived,
+                   s.id,
+                   s.username,
+                   s.spend_date,
+                   s.currency,
+                   s.amount,
+                   s.description
+                   from spend s join category c on s.category_id = c.id
+                   where s.username = ? and s.description = ? order by s.spend_date desc
+                """
     )) {
       ps.setString(1, username);
       ps.setString(2, description);
@@ -200,34 +151,8 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
-  @SuppressWarnings("resource")
-  @Override
-  public void remove(SpendEntity spend) {
-    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
-            "DELETE FROM spend WHERE id = ?"
-    )) {
-      ps.setObject(1, spend.getId());
-      ps.executeUpdate();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  @SuppressWarnings("resource")
-  @Override
-  public void removeCategory(CategoryEntity category) {
-    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
-            "DELETE FROM category WHERE id = ?"
-    )) {
-      ps.setObject(1, category.getId());
-      ps.executeUpdate();
-    } catch (SQLException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   @Nonnull
-  @SuppressWarnings("resource")
+  @Override
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final StringBuilder sql = new StringBuilder(
             """
@@ -275,8 +200,43 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
   }
 
-  @Nonnull
+  @Override
   @SuppressWarnings("resource")
+  public void remove(SpendEntity spend) {
+    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
+            "DELETE FROM spend WHERE id = ?"
+    )) {
+      ps.setObject(1, spend.getId());
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Nonnull
+  @Override
+  public CategoryEntity createCategory(CategoryEntity category) {
+    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
+            "INSERT INTO category (username, name, archived) " +
+                    "VALUES (?, ?, ?)",
+            Statement.RETURN_GENERATED_KEYS
+    )) {
+      ps.setString(1, category.getUsername());
+      ps.setString(2, category.getName());
+      ps.setBoolean(3, category.isArchived());
+
+      ps.executeUpdate();
+
+      final UUID generatedKey = extractIdFromStatement(ps);
+      category.setId(generatedKey);
+      return category;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Nonnull
+  @Override
   public CategoryEntity updateCategory(CategoryEntity category) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             """
@@ -297,7 +257,25 @@ public class SpendRepositoryJdbc implements SpendRepository {
   }
 
   @Nonnull
+  @Override
+  public Optional<CategoryEntity> findCategoryById(UUID id) {
+    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
+            "SELECT * FROM category WHERE id = ?"
+    )) {
+      ps.setObject(1, id);
+      ps.execute();
+      final List<CategoryEntity> category = mapStatementToCategory(ps);
+      return category.isEmpty()
+              ? Optional.empty()
+              : Optional.of(category.getFirst());
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Nonnull
   @SuppressWarnings("resource")
+  @Override
   public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             "SELECT * FROM category WHERE username = ? and name = ?"
@@ -315,12 +293,25 @@ public class SpendRepositoryJdbc implements SpendRepository {
   }
 
   @Nonnull
-  @SuppressWarnings("resource")
+  @Override
   public List<CategoryEntity> allCategories(String username) {
     try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
             "SELECT * FROM category")) {
       ps.execute();
       return mapStatementToCategory(ps);
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  @SuppressWarnings("resource")
+  public void removeCategory(CategoryEntity category) {
+    try (PreparedStatement ps = holder(SPEND_URL).connection().prepareStatement(
+            "DELETE FROM category WHERE id = ?"
+    )) {
+      ps.setObject(1, category.getId());
+      ps.executeUpdate();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -380,5 +371,4 @@ public class SpendRepositoryJdbc implements SpendRepository {
     }
     return result;
   }
-
 }

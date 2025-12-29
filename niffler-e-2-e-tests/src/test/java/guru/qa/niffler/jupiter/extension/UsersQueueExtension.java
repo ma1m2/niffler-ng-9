@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 //hw 3.2
+@Deprecated
 public class UsersQueueExtension implements
         BeforeTestExecutionCallback,
         AfterTestExecutionCallback,

@@ -59,7 +59,7 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
       return ps;
     }, kh);
 
-    final UUID generatedKey = (UUID) Objects.requireNonNull(kh.getKeys()).get("id");
+    final UUID generatedKey = (UUID) kh.getKeys().get("id");
     spend.setId(generatedKey);
     return spend;
   }
@@ -107,8 +107,26 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
       return ps;
     }, kh);
 
-    final UUID generatedKey = (UUID) Objects.requireNonNull(kh.getKeys()).get("id");
+    final UUID generatedKey = (UUID) kh.getKeys().get("id");
     category.setId(generatedKey);
+    return category;
+  }
+
+  @Nonnull
+  @Override
+  public CategoryEntity updateCategory(CategoryEntity category) {
+    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
+    jdbcTemplate.update(
+            """
+                  UPDATE "category"
+                    SET name     = ?,
+                        archived = ?
+                    WHERE id = ?
+                """,
+            category.getName(),
+            category.isArchived(),
+            category.getId()
+    );
     return category;
   }
 
@@ -133,8 +151,34 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
 
   @Nonnull
   @Override
-  public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
-    return Optional.empty();
+  public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
+    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
+    try {
+      return Optional.ofNullable(
+              jdbcTemplate.queryForObject(
+                      """
+                            SELECT * FROM "category" WHERE username = ? and name = ?
+                          """,
+                      CategoryEntityRowMapper.instance,
+                      username,
+                      name
+              )
+      );
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
+
+  @Nonnull
+  @Override
+  public List<CategoryEntity> allCategories(String username) {
+    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
+    return jdbcTemplate.query(
+            """
+                  SELECT * FROM "category"
+                """,
+            CategoryEntityRowMapper.instance
+    );
   }
 
   @Nonnull
@@ -196,65 +240,6 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
 
   @Nonnull
   @Override
-  public void remove(SpendEntity spend) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
-    jdbcTemplate.update("DELETE FROM spend WHERE id = ?", spend.getId());
-  }
-
-  @Override
-  public void removeCategory(CategoryEntity category) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
-    jdbcTemplate.update("DELETE FROM category WHERE id = ?", category.getId());
-  }
-
-  @Nonnull
-  public CategoryEntity updateCategory(CategoryEntity category) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
-    jdbcTemplate.update(
-            """
-                  UPDATE "category"
-                    SET name     = ?,
-                        archived = ?
-                    WHERE id = ?
-                """,
-            category.getName(),
-            category.isArchived(),
-            category.getId()
-    );
-    return category;
-  }
-
-  @Nonnull
-  public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
-    try {
-      return Optional.ofNullable(
-              jdbcTemplate.queryForObject(
-                      """
-                            SELECT * FROM "category" WHERE username = ? and name = ?
-                          """,
-                      CategoryEntityRowMapper.instance,
-                      username,
-                      name
-              )
-      );
-    } catch (EmptyResultDataAccessException e) {
-      return Optional.empty();
-    }
-  }
-
-  @Nonnull
-  public List<CategoryEntity> allCategories(String username) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
-    return jdbcTemplate.query(
-            """
-                  SELECT * FROM "category"
-                """,
-            CategoryEntityRowMapper.instance
-    );
-  }
-
-  @Nonnull
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final StringBuilder sql = new StringBuilder(
             """
@@ -295,4 +280,15 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
             : Collections.emptyList();
   }
 
+  @Override
+  public void remove(SpendEntity spend) {
+    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
+    jdbcTemplate.update("DELETE FROM spend WHERE id = ?", spend.getId());
+  }
+
+  @Override
+  public void removeCategory(CategoryEntity category) {
+    final JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(SPEND_URL));
+    jdbcTemplate.update("DELETE FROM category WHERE id = ?", category.getId());
+  }
 }

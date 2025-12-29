@@ -1,26 +1,30 @@
-package guru.qa.niffler.api;
+package guru.qa.niffler.service.impl;
 
+import guru.qa.niffler.api.SpendApi;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.service.RestClient;
+import guru.qa.niffler.service.SpendClient;
 import io.qameta.allure.Step;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
+import static guru.qa.niffler.utils.DateUtils.getDateAsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ParametersAreNonnullByDefault
-public class SpendApiClient extends RestClient {
+public final class SpendApiClient extends RestClient implements SpendClient {
 
+  private static final String ISO_DATE = "yyyy-MM-dd";
   private final SpendApi spendApi;
 
   public SpendApiClient() {
@@ -28,11 +32,13 @@ public class SpendApiClient extends RestClient {
     this.spendApi = create(SpendApi.class);
   }
 
-  @Step("Send REST POST('/internal/spends/add') request to niffler-spend {0}")
-  public @Nullable SpendJson addSpend(SpendJson spendJson) {
+  @Override
+  @Step("Create spend using internal REST API")
+  @Nullable
+  public SpendJson createSpend(SpendJson spend) {
     final Response<SpendJson> response;
     try {
-      response = spendApi.addSpend(spendJson)
+      response = spendApi.addSpend(spend)
               .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
@@ -41,11 +47,14 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  @Step("Send REST @PATCH('/internal/spends/edit') request to niffler-spend {0}")
-  public @Nullable SpendJson editSpend(SpendJson spend) {
+  @Override
+  @Step("Edit spend using internal REST API")
+  @Nullable
+  public SpendJson editSpend(SpendJson spend) {
     final Response<SpendJson> response;
     try {
-      response = spendApi.editSpend(spend).execute();
+      response = spendApi.editSpend(spend)
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -53,11 +62,14 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  @Step("Send REST @GET('internal/spends/{id}') request to niffler-spend {0}")
-  public @Nullable SpendJson getSpend(String id) {
+  @Override
+  @Step("Get spend using internal REST API by id: {id}")
+  @Nullable
+  public SpendJson getSpend(String id) {
     final Response<SpendJson> response;
     try {
-      response = spendApi.getSpend(id).execute();
+      response = spendApi.getSpend(id)
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -65,14 +77,17 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  @Step("Send REST @GET('internal/spends/all') request to niffler-spend")
+  @Override
+  @Step("Get all users spends using internal REST API by username: {username}")
+  @Nonnull
   public List<SpendJson> allSpends(String username,
-                                   @Nullable  CurrencyValues currency,
-                                   @Nullable String from,
-                                   @Nullable String to) {
+                                   @Nullable CurrencyValues currency,
+                                   @Nullable Date from,
+                                   @Nullable Date to) {
     final Response<List<SpendJson>> response;
     try {
-      response = spendApi.allSpends(username, currency, from, to).execute();
+      response = spendApi.allSpends(username, currency, getDateAsString(from, ISO_DATE), getDateAsString(to, ISO_DATE))
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -82,22 +97,27 @@ public class SpendApiClient extends RestClient {
             : Collections.emptyList();
   }
 
-  @Step("Send REST @DELETE('internal/spends/remove') request to niffler-spend username: {0}, ids: {1}")
+  @Override
+  @Step("Remove spends using internal REST API by username: '{username}' and ids: {ids}")
   public void removeSpends(String username, String... ids) {
     final Response<Void> response;
     try {
-      response = spendApi.removeSpends(username, Arrays.stream(ids).toList()).execute();
+      response = spendApi.removeSpends(username, Arrays.stream(ids).toList())
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
     assertEquals(200, response.code());
   }
 
-  @Step("Send REST @POST('internal/categories/add') request to niffler-spend username: {0}, ids: {1}")
-  public @Nullable CategoryJson createCategory(CategoryJson categoryJson) {
+  @Override
+  @Step("Create category using internal REST API")
+  @Nullable
+  public CategoryJson createCategory(CategoryJson category) {
     final Response<CategoryJson> response;
     try {
-      response = spendApi.createCategory(categoryJson).execute();
+      response = spendApi.addCategory(category)
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -105,10 +125,14 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  public @Nullable CategoryJson updateCategory(CategoryJson category) {
+  @Override
+  @Step("Edit category using internal REST API")
+  @Nullable
+  public CategoryJson updateCategory(CategoryJson category) {
     final Response<CategoryJson> response;
     try {
-      response = spendApi.updateCategory(category).execute();
+      response = spendApi.updateCategory(category)
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -116,10 +140,14 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  public List<CategoryJson> allCategories(String username){
+  @Override
+  @Step("Get all users categories using internal REST API by username: {username}")
+  @Nonnull
+  public List<CategoryJson> allCategories(String username) {
     final Response<List<CategoryJson>> response;
     try {
-      response = spendApi.allCategories(username).execute();
+      response = spendApi.allCategories(username)
+              .execute();
     } catch (IOException e) {
       throw new AssertionError(e);
     }
@@ -129,4 +157,8 @@ public class SpendApiClient extends RestClient {
             : Collections.emptyList();
   }
 
+  @Override
+  public void removeCategory(CategoryJson category) {
+    throw new UnsupportedOperationException("Can`t remove category");
+  }
 }

@@ -1,5 +1,4 @@
 package guru.qa.niffler.data.extractor;
-
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
@@ -20,7 +19,22 @@ public class SpendEntityRowExtractor implements ResultSetExtractor<List<SpendEnt
   private SpendEntityRowExtractor() {
   }
 
+  /**
+   * select
+   * c.id as category_id,
+   * c.name as category_name,
+   * c.archived as category_archived,
+   * s.id,
+   * s.username,
+   * s.spend_date,
+   * s.currency,
+   * s.amount,
+   * s.description
+   * from spend s join category c on s.category_id = c.id
+   * where s.id = '5cd0ae64-a4c2-423c-81ea-a4b678c8ae23'
+   */
   @Override
+  @Nonnull
   public List<SpendEntity> extractData(ResultSet rs) throws SQLException, DataAccessException {
     List<SpendEntity> result = new ArrayList<>();
 
@@ -44,5 +58,4 @@ public class SpendEntityRowExtractor implements ResultSetExtractor<List<SpendEnt
     }
     return result;
   }
-
 }

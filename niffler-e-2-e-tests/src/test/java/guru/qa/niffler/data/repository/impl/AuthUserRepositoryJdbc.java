@@ -22,17 +22,16 @@ import static guru.qa.niffler.data.jdbc.Connections.holder;
 @ParametersAreNonnullByDefault
 public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
-  private static final Config CFG = Config.getInstance();
-  private static final String URL = CFG.authJdbcUrl();
+  private static final String AUTH_URL = Config.getInstance().authJdbcUrl();
 
   @Nonnull
   @SuppressWarnings("resource")
   @Override
   public AuthUserEntity create(AuthUserEntity user) {
-    try (PreparedStatement userPs = holder(URL).connection().prepareStatement(
+    try (PreparedStatement userPs = holder(AUTH_URL).connection().prepareStatement(
             "INSERT INTO \"user\" (username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired) " +
                     "VALUES (?, ?, ?, ?, ?, ?)", PreparedStatement.RETURN_GENERATED_KEYS);
-         PreparedStatement authorityPs = holder(URL).connection().prepareStatement(
+         PreparedStatement authorityPs = holder(AUTH_URL).connection().prepareStatement(
                  "INSERT INTO \"authority\" (user_id, authority) VALUES (?, ?)")) {
       userPs.setString(1, user.getUsername());
       userPs.setString(2, user.getPassword());
@@ -71,7 +70,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
   @SuppressWarnings("resource")
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
-    try (PreparedStatement ps = holder(URL).connection()
+    try (PreparedStatement ps = holder(AUTH_URL).connection()
             .prepareStatement("select * from \"user\" u join authority a on u.id = a.user_id where u.id = ?")) {
       ps.setObject(1, id);
 
@@ -108,14 +107,4 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 
-  @Nonnull
-  @Override
-  public AuthUserEntity update(AuthUserEntity user) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  public void remove(AuthUserEntity user) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
 }
