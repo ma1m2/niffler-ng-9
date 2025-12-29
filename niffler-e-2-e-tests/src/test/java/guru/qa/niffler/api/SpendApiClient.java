@@ -1,13 +1,13 @@
 package guru.qa.niffler.api;
 
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.service.RestClient;
+import io.qameta.allure.Step;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-import retrofit2.http.Query;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -19,17 +19,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ParametersAreNonnullByDefault
-public class SpendApiClient {
+public class SpendApiClient extends RestClient {
 
-  private static final Config CFG = Config.getInstance();
+  private final SpendApi spendApi;
 
-  private static final Retrofit retrofit = new Retrofit.Builder()
-          .baseUrl(CFG.spendUrl())
-          .addConverterFactory(JacksonConverterFactory.create())
-          .build();
+  public SpendApiClient() {
+    super(CFG.spendUrl());
+    this.spendApi = create(SpendApi.class);
+  }
 
-  private final SpendApi spendApi = retrofit.create(SpendApi.class);
-
+  @Step("Send REST POST('/internal/spends/add') request to niffler-spend {0}")
   public @Nullable SpendJson addSpend(SpendJson spendJson) {
     final Response<SpendJson> response;
     try {
@@ -42,6 +41,7 @@ public class SpendApiClient {
     return response.body();
   }
 
+  @Step("Send REST @PATCH('/internal/spends/edit') request to niffler-spend {0}")
   public @Nullable SpendJson editSpend(SpendJson spend) {
     final Response<SpendJson> response;
     try {
@@ -53,7 +53,7 @@ public class SpendApiClient {
     return response.body();
   }
 
-
+  @Step("Send REST @GET('internal/spends/{id}') request to niffler-spend {0}")
   public @Nullable SpendJson getSpend(String id) {
     final Response<SpendJson> response;
     try {
@@ -65,6 +65,7 @@ public class SpendApiClient {
     return response.body();
   }
 
+  @Step("Send REST @GET('internal/spends/all') request to niffler-spend")
   public List<SpendJson> allSpends(String username,
                                    @Nullable  CurrencyValues currency,
                                    @Nullable String from,
@@ -81,6 +82,7 @@ public class SpendApiClient {
             : Collections.emptyList();
   }
 
+  @Step("Send REST @DELETE('internal/spends/remove') request to niffler-spend username: {0}, ids: {1}")
   public void removeSpends(String username, String... ids) {
     final Response<Void> response;
     try {
@@ -91,6 +93,7 @@ public class SpendApiClient {
     assertEquals(200, response.code());
   }
 
+  @Step("Send REST @POST('internal/categories/add') request to niffler-spend username: {0}, ids: {1}")
   public @Nullable CategoryJson createCategory(CategoryJson categoryJson) {
     final Response<CategoryJson> response;
     try {

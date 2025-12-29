@@ -11,7 +11,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class MainPage {
+public class MainPage extends BasePage<MainPage>{
   private final SelenideElement spendingTable = $("#spendings");
   private final SelenideElement statComponent = $("#stat");
   private final SelenideElement historySpending = $x("//h2[contains(text(),'History')]");

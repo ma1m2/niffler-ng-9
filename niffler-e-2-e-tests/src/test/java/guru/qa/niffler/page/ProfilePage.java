@@ -17,7 +17,7 @@ import static com.codeborne.selenide.Selenide.$$;
 import static com.codeborne.selenide.Selenide.$x;
 
 @ParametersAreNonnullByDefault
-public class ProfilePage {
+public class ProfilePage extends BasePage<ProfilePage> {
   //http://127.0.0.1:3000/profile
   public static String url = Config.getInstance().frontUrl() + "profile";
 
