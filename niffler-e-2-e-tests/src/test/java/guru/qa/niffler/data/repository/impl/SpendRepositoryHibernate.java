@@ -29,6 +29,7 @@ import static guru.qa.niffler.data.jpa.EntityManagers.em;
 public class SpendRepositoryHibernate implements SpendRepository {
 
   private static final Config CFG = Config.getInstance();
+
   private final EntityManager entityManager = em(CFG.spendJdbcUrl());
 
   @Nonnull
@@ -44,28 +45,6 @@ public class SpendRepositoryHibernate implements SpendRepository {
   public SpendEntity update(SpendEntity spend) {
     entityManager.joinTransaction();
     return entityManager.merge(spend);
-  }
-
-  @Nonnull
-  @Override
-  public CategoryEntity createCategory(CategoryEntity category) {
-    entityManager.joinTransaction();
-    entityManager.persist(category);
-    return category;
-  }
-
-  @Nonnull
-  @Override
-  public Optional<CategoryEntity> findCategoryById(UUID id) {
-    return Optional.ofNullable(
-            entityManager.find(CategoryEntity.class, id)
-    );
-  }
-
-  @Nonnull
-  @Override
-  public Optional<CategoryEntity> findCategoryByUsernameAndSpendName(String username, String name) {
-    throw new UnsupportedOperationException("Not supported yet.");
   }
 
   @Nonnull
@@ -93,19 +72,8 @@ public class SpendRepositoryHibernate implements SpendRepository {
     }
   }
 
-  @Override
-  public void remove(SpendEntity spend) {
-    entityManager.joinTransaction();
-    entityManager.remove(entityManager.contains(spend) ? spend : entityManager.merge(spend));
-  }
-
-  @Override
-  public void removeCategory(CategoryEntity category) {
-    entityManager.joinTransaction();
-    entityManager.remove(entityManager.contains(category) ? category : entityManager.merge(category));
-  }
-
   @Nonnull
+  @Override
   public List<SpendEntity> all(String username, @Nullable CurrencyValues currency, @Nullable Date from, @Nullable Date to) {
     final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
     final CriteriaQuery<SpendEntity> cq = cb.createQuery(SpendEntity.class);
@@ -129,13 +97,38 @@ public class SpendRepositoryHibernate implements SpendRepository {
     return entityManager.createQuery(cq).getResultList();
   }
 
+  @Override
+  public void remove(SpendEntity spend) {
+    entityManager.joinTransaction();
+    entityManager.remove(entityManager.contains(spend) ? spend : entityManager.merge(spend));
+  }
+
+
   @Nonnull
+  @Override
+  public CategoryEntity createCategory(CategoryEntity category) {
+    entityManager.joinTransaction();
+    entityManager.persist(category);
+    return category;
+  }
+
+  @NotNull
+  @Override
   public CategoryEntity updateCategory(CategoryEntity category) {
     entityManager.joinTransaction();
     return entityManager.merge(category);
   }
 
   @Nonnull
+  @Override
+  public Optional<CategoryEntity> findCategoryById(UUID id) {
+    return Optional.ofNullable(
+            entityManager.find(CategoryEntity.class, id)
+    );
+  }
+
+  @Nonnull
+  @Override
   public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
     try {
       return Optional.of(
@@ -150,6 +143,7 @@ public class SpendRepositoryHibernate implements SpendRepository {
   }
 
   @Nonnull
+  @Override
   public List<CategoryEntity> allCategories(String username) {
     return entityManager.createQuery(
                     "select c from CategoryEntity c where c.username =: username order by c.name asc",
@@ -159,5 +153,10 @@ public class SpendRepositoryHibernate implements SpendRepository {
             .getResultList();
   }
 
+  @Override
+  public void removeCategory(CategoryEntity category) {
+    entityManager.joinTransaction();
+    entityManager.remove(entityManager.contains(category) ? category : entityManager.merge(category));
+  }
 }
 

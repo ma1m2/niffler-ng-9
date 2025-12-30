@@ -1,10 +1,9 @@
-package guru.qa.niffler.api;
+package guru.qa.niffler.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import guru.qa.niffler.api.GhApi;
 import guru.qa.niffler.service.RestClient;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;

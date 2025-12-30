@@ -17,8 +17,7 @@ import static guru.qa.niffler.data.jpa.EntityManagers.*;
 @ParametersAreNonnullByDefault
 public class AuthUserRepositoryHibernate implements AuthUserRepository {
 
-  private static final Config CFG = Config.getInstance();
-  private final EntityManager entityManager = em(CFG.authJdbcUrl());
+  private final EntityManager entityManager = em(Config.getInstance().authJdbcUrl());
 
   @Nonnull
   @Override
@@ -47,16 +46,5 @@ public class AuthUserRepositoryHibernate implements AuthUserRepository {
     }catch (NoResultException e){
       return Optional.empty();
     }
-  }
-
-  @Nonnull
-  @Override
-  public AuthUserEntity update(AuthUserEntity user) {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  public void remove(AuthUserEntity user) {
-    throw new UnsupportedOperationException("Not supported yet.");
   }
 }

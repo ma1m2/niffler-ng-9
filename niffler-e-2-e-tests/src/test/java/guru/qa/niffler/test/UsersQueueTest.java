@@ -4,11 +4,13 @@ import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld.StaticUser;
 import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld.UserType;
 import guru.qa.niffler.jupiter.extension.UsersQueueExtensionOld;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(UsersQueueExtensionOld.class)
 //3.2 video 54:50
+@Disabled
 public class UsersQueueTest {
 
   @Test

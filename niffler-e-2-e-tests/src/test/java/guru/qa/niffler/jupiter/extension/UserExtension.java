@@ -42,9 +42,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                         DEFAULT_PASSWORD,
                         friends,
                         incomes,
-                        outcomes,
-                        new ArrayList<>(),
-                        new ArrayList<>()
+                        outcomes
                 );
 
                 context.getStore(NAMESPACE).put(

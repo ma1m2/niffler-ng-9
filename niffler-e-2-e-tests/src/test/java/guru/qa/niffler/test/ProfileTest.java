@@ -1,74 +1,136 @@
 package guru.qa.niffler.test;
 
 import com.codeborne.selenide.Selenide;
-import com.github.javafaker.Faker;
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.jupiter.extension.BrowserExtension;
-import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.ProfilePage;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+
+import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
+import static guru.qa.niffler.utils.RandomDataUtils.randomName;
 
 @WebTest
 public class ProfileTest {
-  private static final Config CFG = Config.getInstance();
-
-  @Test
-  @DisplayName("Create new catecory")
-  public void createNewCategory(){
-    String category = new Faker().animal().name();
-    Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .successLogin("anna", "12345")
-            .checkThatMainPageLoaded();
-
-    System.out.println("New category " + category);
-    Selenide.open(CFG.frontUrl()+"profile", ProfilePage.class)
-            .checkThatItIsProfilePage()
-            .addNewCategory(category)
-            .checkCategoryExists(category);
-  }
 
   @User(
-          username = "anna",
           categories = @Category(
                   archived = true
           )
   )
   @Test
-  @DisplayName("Archived Category is Present In Categories List")
-  void archivedCategoryShouldPresentInCategoriesList(CategoryJson category){
-    Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .successLogin(category.username(), "12345")
-            .checkThatMainPageLoaded();
+  void archivedCategoryShouldPresentInCategoriesList(UserJson user) {
+    final String categoryName = user.testData().categoryDescriptions()[0];
 
-    System.out.println("New category " + category.name());
-    Selenide.open(CFG.frontUrl()+"profile", ProfilePage.class)
-            .checkThatItIsProfilePage()
-            .checkArchivedCategoryExists(category.name());
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded();
+
+    Selenide.open(ProfilePage.URL, ProfilePage.class)
+            .checkArchivedCategoryExists(categoryName);
   }
 
   @User(
-          username = "anna",
           categories = @Category(
                   archived = false
           )
   )
   @Test
-  @DisplayName("Active Category is Present In Categories List")
-  void activeCategoryShouldPresentInCategoriesList(CategoryJson category){
-    Selenide.open(CFG.frontUrl(), LoginPage.class)
-            .successLogin(category.username(), "12345")
-            .checkThatMainPageLoaded();
+  void activeCategoryShouldPresentInCategoriesList(UserJson user) {
+    final String categoryName = user.testData().categoryDescriptions()[0];
 
-    System.out.println("New category " + category.name());
-    Selenide.open(CFG.frontUrl()+"profile", ProfilePage.class)
-            .checkThatItIsProfilePage()
-            .checkCategoryExists(category.name());
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded();
+
+    Selenide.open(ProfilePage.URL, ProfilePage.class)
+            .checkCategoryExists(categoryName);
   }
 
+  @User
+  @Test
+  void shouldUpdateProfileWithAllFieldsSet(UserJson user) {
+    final String newName = randomName();
+
+    ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded()
+            .getHeader()
+            .toProfilePage()
+            .uploadPhotoFromClasspath("img/cat.jpeg")
+            .setName(newName)
+            .submitProfile()
+            .checkAlert("Profile successfully updated");
+
+    Selenide.refresh();
+
+    profilePage.checkName(newName)
+            .checkPhotoExist();
+  }
+
+  @User
+  @Test
+  void shouldUpdateProfileWithOnlyRequiredFields(UserJson user) {
+    final String newName = randomName();
+
+    ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded()
+            .getHeader()
+            .toProfilePage()
+            .setName(newName)
+            .submitProfile()
+            .checkAlert("Profile successfully updated");
+
+    Selenide.refresh();
+
+    profilePage.checkName(newName);
+  }
+
+  @User
+  @Test
+  void shouldAddNewCategory(UserJson user) {
+    String newCategory = randomCategoryName();
+
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded()
+            .getHeader()
+            .toProfilePage()
+            .addCategory(newCategory)
+            .checkAlert("You've added new category:")
+            .checkCategoryExists(newCategory);
+  }
+
+  @User(
+          categories = {
+                  @Category(name = "Food"),
+                  @Category(name = "Bars"),
+                  @Category(name = "Clothes"),
+                  @Category(name = "Friends"),
+                  @Category(name = "Music"),
+                  @Category(name = "Sports"),
+                  @Category(name = "Walks"),
+                  @Category(name = "Books")
+          }
+  )
+
+  @Test
+  void shouldForbidAddingMoreThat8Categories(UserJson user) {
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded()
+            .getHeader()
+            .toProfilePage()
+            .checkThatCategoryInputDisabled();
+  }
 }
