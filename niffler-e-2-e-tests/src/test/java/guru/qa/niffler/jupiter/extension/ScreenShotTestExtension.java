@@ -35,7 +35,16 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
   @SneakyThrows
   @Override
   public BufferedImage resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return ImageIO.read(new ClassPathResource("img/expected-stat.png").getInputStream());
+    return extensionContext.getTestMethod()
+            .map(m -> m.getAnnotation(ScreenShotTest.class))
+            .map(ScreenShotTest::value)
+            .map(path -> {
+              try {
+                return ImageIO.read(new ClassPathResource(path).getInputStream());
+              } catch (IOException e) {
+                throw new ParameterResolutionException("Failed to load image: " + path, e);
+              }
+            }).orElseThrow(() -> new ParameterResolutionException("Annotation @ScreenShotTest not found"));
   }
 
   @Override

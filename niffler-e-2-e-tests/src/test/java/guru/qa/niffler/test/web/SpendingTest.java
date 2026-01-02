@@ -10,16 +10,11 @@ import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.utils.RandomDataUtils;
 import guru.qa.niffler.utils.ScreenDiffResult;
-import io.qameta.allure.Allure;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
-import ru.yandex.qatools.ashot.comparison.ImageDiff;
-import ru.yandex.qatools.ashot.comparison.ImageDiffer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -129,11 +124,13 @@ public class SpendingTest {
           )
   )
   @ScreenShotTest("img/expected-stat.png")
-  void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
+  void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException {
     Selenide.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .checkThatPageLoaded();
+
+    Selenide.sleep(3000);
 
     BufferedImage actual = ImageIO.read($("canvas[role='img']").screenshot());
     assertFalse(new ScreenDiffResult(
@@ -141,5 +138,4 @@ public class SpendingTest {
             actual
     ));
   }
-
 }
