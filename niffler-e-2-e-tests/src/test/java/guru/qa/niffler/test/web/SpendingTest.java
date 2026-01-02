@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
@@ -8,9 +9,22 @@ import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.utils.RandomDataUtils;
+import guru.qa.niffler.utils.ScreenDiffResult;
+import io.qameta.allure.Allure;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ClassPathResource;
+import ru.yandex.qatools.ashot.comparison.ImageDiff;
+import ru.yandex.qatools.ashot.comparison.ImageDiffer;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Date;
+
+import static com.codeborne.selenide.Selenide.$;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @WebTest
 public class SpendingTest {
@@ -97,7 +111,6 @@ public class SpendingTest {
                   amount = 89990
           )
   )
-
   @Test
   void deleteSpendingTest(UserJson user) {
     Selenide.open(LoginPage.URL, LoginPage.class)
@@ -107,4 +120,26 @@ public class SpendingTest {
             .deleteSpending("Обучение Advanced 2.0")
             .checkTableSize(0);
   }
+
+  @User(
+          spendings = @Spending(
+                  category = "Обучение",
+                  description = "Обучение Advanced 2.0",
+                  amount = 79990
+          )
+  )
+  @ScreenShotTest("img/expected-stat.png")
+  void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException, InterruptedException {
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded();
+
+    BufferedImage actual = ImageIO.read($("canvas[role='img']").screenshot());
+    assertFalse(new ScreenDiffResult(
+            expected,
+            actual
+    ));
+  }
+
 }
