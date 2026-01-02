@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
+import org.junit.platform.commons.support.SearchOption;
 
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ public class IssueExtension implements ExecutionCondition {
     annotation = AnnotationSupport.findAnnotation(
             context.getRequiredTestClass(),
             DisableByIssue.class,
-            context.getEnclosingTestClasses()
+            SearchOption.INCLUDE_ENCLOSING_CLASSES
     );
 
     if (context.getTestMethod().isPresent() && annotation.isEmpty()) {

@@ -16,11 +16,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 
-import org.apache.commons.lang3.ArrayUtils.*;
-
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
-//7.2 video
+//video 7.2
 @ParametersAreNonnullByDefault
 public abstract class RestClient {
 
@@ -30,19 +28,19 @@ public abstract class RestClient {
   private final Retrofit retrofit;
 
   public RestClient(String baseUrl) {
-    this(baseUrl, false, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.HEADERS, null);
+    this(baseUrl, false, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.HEADERS, (Interceptor[]) null);
   }
 
   public RestClient(String baseUrl, boolean followRedirect) {
-    this(baseUrl, followRedirect, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.HEADERS, null);
+    this(baseUrl, followRedirect, JacksonConverterFactory.create(), HttpLoggingInterceptor.Level.HEADERS, (Interceptor[]) null);
   }
 
   public RestClient(String baseUrl, boolean followRedirect, Converter.Factory converterFactory) {
-    this(baseUrl, followRedirect, converterFactory, HttpLoggingInterceptor.Level.HEADERS, null);
+    this(baseUrl, followRedirect, converterFactory, HttpLoggingInterceptor.Level.HEADERS, (Interceptor[]) null);
   }
 
   public RestClient(String baseUrl, Converter.Factory converterFactory) {
-    this(baseUrl, false, converterFactory, HttpLoggingInterceptor.Level.HEADERS, null);
+    this(baseUrl, false, converterFactory, HttpLoggingInterceptor.Level.HEADERS, (Interceptor[]) null);
   }
 
   public RestClient(String baseUrl, boolean followRedirect, Converter.Factory converterFactory, Interceptor... interceptors) {
@@ -54,6 +52,7 @@ public abstract class RestClient {
             .followRedirects(followRedirect);
 
     if (isNotEmpty(interceptors)) {
+      assert interceptors != null;
       for (Interceptor interceptor : interceptors) {
         clientBuilder.addNetworkInterceptor(interceptor);
       }
