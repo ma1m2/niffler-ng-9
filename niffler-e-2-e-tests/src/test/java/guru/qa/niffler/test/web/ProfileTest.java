@@ -63,8 +63,8 @@ public class ProfileTest {
   }
 
   @User
-  @Test
-  void shouldUpdateProfileWithAllFieldsSet(UserJson user) {
+  @ScreenShotTest("img/expected-avatar.png")
+  void shouldUpdateProfileWithAllFieldsSet(UserJson user, BufferedImage expectedAvatar) throws IOException {
     final String newName = randomName();
 
     ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
@@ -73,7 +73,7 @@ public class ProfileTest {
             .checkThatPageLoaded()
             .getHeader()
             .toProfilePage()
-            .uploadPhotoFromClasspath("img/cat.jpeg")
+            .uploadPhotoFromClasspath("img/Anna.png")
             .setName(newName)
             .submitProfile()
             .checkAlert("Profile successfully updated");
@@ -81,7 +81,8 @@ public class ProfileTest {
     Selenide.refresh();
 
     profilePage.checkName(newName)
-            .checkPhotoExist();
+            .checkPhotoExist()
+            .checkPhoto(expectedAvatar);
   }
 
   @User
@@ -163,4 +164,6 @@ public class ProfileTest {
 
     assertFalse(new ScreenDiffResult(expected, actual));
   }
+
+
 }

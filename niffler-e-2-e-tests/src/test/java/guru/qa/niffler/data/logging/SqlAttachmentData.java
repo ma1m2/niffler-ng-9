@@ -3,6 +3,7 @@ package guru.qa.niffler.data.logging;
 import io.qameta.allure.attachment.AttachmentData;
 import lombok.Getter;
 
+//video 9.2
 @Getter
 public class SqlAttachmentData implements AttachmentData {
 

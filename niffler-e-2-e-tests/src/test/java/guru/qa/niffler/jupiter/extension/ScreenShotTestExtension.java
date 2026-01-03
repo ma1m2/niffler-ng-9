@@ -13,12 +13,15 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.springframework.core.io.ClassPathResource;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
+@ParametersAreNonnullByDefault
 public class ScreenShotTestExtension implements ParameterResolver, TestExecutionExceptionHandler {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ScreenShotTestExtension.class);
@@ -35,20 +38,28 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
   @SneakyThrows
   @Override
   public BufferedImage resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return extensionContext.getTestMethod()
-            .map(m -> m.getAnnotation(ScreenShotTest.class))
-            .map(ScreenShotTest::value)
-            .map(path -> {
-              try {
-                return ImageIO.read(new ClassPathResource(path).getInputStream());
-              } catch (IOException e) {
-                throw new ParameterResolutionException("Failed to load image: " + path, e);
-              }
-            }).orElseThrow(() -> new ParameterResolutionException("Annotation @ScreenShotTest not found"));
+    final ScreenShotTest screenShotTest = extensionContext.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
+    return ImageIO.read(
+            new ClassPathResource(
+                    screenShotTest.value()
+            ).getInputStream()
+    );
   }
 
   @Override
-  public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable) throws Throwable {
+  public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
+    final ScreenShotTest screenShotTest = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
+    if (screenShotTest.rewriteExpected()) {
+      final BufferedImage actual = getActual();
+      if (actual != null) {
+        ImageIO.write(
+                actual,
+                "png",
+                new File("src/test/resources/" + screenShotTest.value())
+        );
+      }
+    }
+
     ScreenDif screenDif = new ScreenDif(
             "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
             "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
@@ -67,7 +78,7 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     TestMethodContextExtension.context().getStore(NAMESPACE).put("expected", expected);
   }
 
-  private BufferedImage getExpected() {
+  public static BufferedImage getExpected() {
     return TestMethodContextExtension.context().getStore(NAMESPACE).get("expected", BufferedImage.class);
   }
 
@@ -75,7 +86,7 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     TestMethodContextExtension.context().getStore(NAMESPACE).put("actual", actual);
   }
 
-  private BufferedImage getActual() {
+  public static BufferedImage getActual() {
     return TestMethodContextExtension.context().getStore(NAMESPACE).get("actual", BufferedImage.class);
   }
 
@@ -83,15 +94,15 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     TestMethodContextExtension.context().getStore(NAMESPACE).put("diff", diff);
   }
 
-  private BufferedImage getDiff() {
+  public static BufferedImage getDiff() {
     return TestMethodContextExtension.context().getStore(NAMESPACE).get("diff", BufferedImage.class);
   }
 
   private static byte[] imageToBytes(BufferedImage image) {
-    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()){
-      ImageIO.write(image,"png", outputStream);
+    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      ImageIO.write(image, "png", outputStream);
       return outputStream.toByteArray();
-    }catch (IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

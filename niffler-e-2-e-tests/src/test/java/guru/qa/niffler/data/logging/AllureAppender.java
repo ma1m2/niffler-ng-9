@@ -11,6 +11,7 @@ import io.qameta.allure.attachment.FreemarkerAttachmentRenderer;
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 import static org.apache.commons.lang3.StringUtils.substringBetween;
 
+//video 9.2
 public class AllureAppender extends StdoutLogger {
 
   private final String templateName = "sql-attachment.ftl";
