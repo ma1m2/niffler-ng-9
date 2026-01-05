@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 //add from 3.3 1:01:01 createdCategory()
 //hw 3.3 /video 6.3 1:27:01, 1:51:20
+@ParametersAreNonnullByDefault
 public class CategoryExtension implements
         BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 

@@ -4,8 +4,12 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 //3.3 video 58'
+@ParametersAreNonnullByDefault
 public class TestMethodContextExtension implements BeforeEachCallback, AfterEachCallback {
+
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     Holder.INSTANCE.set(context);
