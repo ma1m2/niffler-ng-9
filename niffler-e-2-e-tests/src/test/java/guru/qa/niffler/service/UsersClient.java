@@ -12,7 +12,7 @@ import java.util.List;
 public interface UsersClient {
 
   static UsersClient getInstance() {
-    return new UsersApiClient();
+    return new UsersDbClient();
   }
 
   @Nonnull
