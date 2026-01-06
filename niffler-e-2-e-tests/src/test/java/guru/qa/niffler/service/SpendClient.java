@@ -16,9 +16,10 @@ import java.util.List;
 public interface SpendClient {
   @Nonnull
   static SpendClient getInstance() {
-    return "api".equals(System.getProperty("client.impl"))
+    return new SpendDbClient();
+    /*"api".equals(System.getProperty("client.impl"))
             ? new SpendApiClient()
-            : new SpendDbClient();
+            : new SpendDbClient();*/
   }
 
   @Nullable
