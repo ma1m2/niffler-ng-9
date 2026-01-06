@@ -180,26 +180,25 @@ public class SpendingTest {
             .checkBubbles(Color.yellow, Color.green);
   }
 
-  @User(//username doesn't save in category table, and error "exist category"
-          //everytime should be new category
+  @User(
           categories = {
-                  @Category(name = "Trip"),
-                  @Category(name = "Repairing", archived = true),
-                  @Category(name = "Insurance", archived = true)
+                  @Category(name = "Traveling"),
+                  @Category(name = "Repair", archived = true),
+                  @Category(name = "Insure", archived = true)
           },
           spendings = {
                   @Spending(
-                          category = "Trip",
+                          category = "Traveling",
                           description = "В Москву",
                           amount = 9500
                   ),
                   @Spending(
-                          category = "Repairing",
+                          category = "Repair",
                           description = "Цемент",
                           amount = 100
                   ),
                   @Spending(
-                          category = "Insurance",
+                          category = "Insure",
                           description = "ОСАГО",
                           amount = 3000
                   )
@@ -212,7 +211,7 @@ public class SpendingTest {
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent()
-            .checkStatisticBubblesContains("Trip 9500 ₽", "Archived 3100 ₽")
+            .checkStatisticBubblesContains("Traveling 9500 ₽", "Archived 3100 ₽")
             .checkStatisticImage(expected);
   }
 }
