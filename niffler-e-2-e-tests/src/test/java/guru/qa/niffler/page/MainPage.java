@@ -26,6 +26,11 @@ public class MainPage extends BasePage<MainPage>{
   }
 
   @Nonnull
+  public StatComponent getStatComponent() {
+    return statComponent;
+  }
+
+  @Nonnull
   public SpendingTable getSpendingTable() {
     spendingTable.getSelf().scrollIntoView(true);
     return spendingTable;

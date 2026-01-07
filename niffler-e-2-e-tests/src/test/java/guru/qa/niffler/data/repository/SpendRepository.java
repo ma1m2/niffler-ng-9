@@ -19,11 +19,12 @@ import java.util.UUID;
 public interface SpendRepository {
   @Nonnull
   static SpendRepository getInstance() {
-    return switch (System.getProperty("repository.impl", "jpa")) {
+    return new SpendRepositoryHibernate();
+/*            switch (System.getProperty("repository.impl", "jpa")) {
       case "jdbc" -> new SpendRepositoryJdbc();
       case "spring-jdbc" -> new SpendRepositorySpringJdbc();
       default -> new SpendRepositoryHibernate();
-    };
+    };*/
   }
 
   @Nonnull

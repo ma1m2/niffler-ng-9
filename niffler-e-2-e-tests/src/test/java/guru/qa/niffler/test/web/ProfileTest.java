@@ -1,17 +1,27 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
+import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.page.ProfilePage;
+import guru.qa.niffler.utils.ScreenDiffResult;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import static com.codeborne.selenide.Selenide.$;
 import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 import static guru.qa.niffler.utils.RandomDataUtils.randomName;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @WebTest
 public class ProfileTest {
@@ -53,8 +63,8 @@ public class ProfileTest {
   }
 
   @User
-  @Test
-  void shouldUpdateProfileWithAllFieldsSet(UserJson user) {
+  @ScreenShotTest("img/expected-avatar.png")
+  void shouldUpdateProfileWithAllFieldsSet(UserJson user, BufferedImage expectedAvatar) throws IOException {
     final String newName = randomName();
 
     ProfilePage profilePage = Selenide.open(LoginPage.URL, LoginPage.class)
@@ -63,7 +73,7 @@ public class ProfileTest {
             .checkThatPageLoaded()
             .getHeader()
             .toProfilePage()
-            .uploadPhotoFromClasspath("img/cat.jpeg")
+            .uploadPhotoFromClasspath("img/Anna.png")
             .setName(newName)
             .submitProfile()
             .checkAlert("Profile successfully updated");
@@ -71,7 +81,8 @@ public class ProfileTest {
     Selenide.refresh();
 
     profilePage.checkName(newName)
-            .checkPhotoExist();
+            .checkPhotoExist()
+            .checkPhoto(expectedAvatar);
   }
 
   @User
@@ -133,4 +144,26 @@ public class ProfileTest {
             .toProfilePage()
             .checkThatCategoryInputDisabled();
   }
+
+  @User
+  @ScreenShotTest("img/expected-avatar.png")//bad-avatar.png
+  void checkAvatarTest(UserJson user,  BufferedImage expected) throws IOException {
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .checkThatPageLoaded()
+            .getHeader()
+            .toProfilePage()
+            .uploadPhotoFromClasspath("img/Anna.png")
+            .submitProfile()
+            .checkAlert("Profile successfully updated");
+
+    Selenide.sleep(3000);
+
+    BufferedImage actual = ImageIO.read(($("#image__input").parent().$("img")).screenshot());
+
+    assertFalse(new ScreenDiffResult(expected, actual));
+  }
+
+
 }

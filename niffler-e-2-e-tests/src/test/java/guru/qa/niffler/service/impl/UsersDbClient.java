@@ -15,6 +15,7 @@ import guru.qa.niffler.model.FriendshipStatus;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.utils.RandomDataUtils;
+import io.qameta.allure.Step;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -31,8 +32,8 @@ public class UsersDbClient implements UsersClient {
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-  private final AuthUserRepository authUserRepo = new AuthUserRepositoryHibernate();
-  private final UserdataUserRepository userdataUserRepo = new UserdataUserRepositoryHibernate();
+  private final AuthUserRepository authUserRepo = AuthUserRepository.getInstance();
+  private final UserdataUserRepository userdataUserRepo = UserdataUserRepository.getInstance();
 
   private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
           CFG.authJdbcUrl(),
@@ -41,6 +42,7 @@ public class UsersDbClient implements UsersClient {
 
   @Nonnull
   @Override
+  @Step("Create user using SQL")
   public UserJson createUser(String username, String password) {
     return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
               AuthUserEntity authUser = authUserEntity(username, password);

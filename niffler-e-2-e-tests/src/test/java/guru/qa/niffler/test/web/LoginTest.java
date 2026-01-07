@@ -1,4 +1,4 @@
-package guru.qa.niffler.test;
+package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.jupiter.annotation.DisableByIssue;
@@ -16,7 +16,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 public class LoginTest {
 
   @User
-  @DisableByIssue("5")//4 closed, 5-open
+  //@DisableByIssue("5")//4 closed, 5-open
   @Test
   @DisplayName("Main Page is displayed after login")
   void mainPageShouldBeDisplayedAfterSuccessLogin(UserJson user) {
@@ -27,7 +27,7 @@ public class LoginTest {
   }
 
   @Test
-  @DisableByIssue("4")//4 closed, 5-open
+  //@DisableByIssue("4")//4 closed, 5-open
   @DisplayName("User Stay On Login Page After Login With Bad Credentials")
   void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
     Selenide.open(LoginPage.URL, LoginPage.class)
