@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
@@ -60,6 +61,25 @@ public class ProfileTest {
 
     Selenide.open(ProfilePage.URL, ProfilePage.class)
             .checkCategoryExists(categoryName);
+  }
+
+  @User
+  @ApiLogin
+  @Test//video 11.2 54'
+  void shouldUpdateProfileWithApiLogin() throws IOException {
+    final String name = randomName();
+    System.out.println("### name: " + name);
+
+    ProfilePage profilePage = Selenide.open(ProfilePage.URL, ProfilePage.class)
+            .uploadPhotoFromClasspath("img/Anna.png")
+            .setName(name)
+            .submitProfile()
+            .checkAlert("Profile successfully updated");
+
+    Selenide.refresh();
+
+    profilePage.checkName(name)
+            .checkPhotoExist();
   }
 
   @User

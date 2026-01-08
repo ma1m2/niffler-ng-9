@@ -4,7 +4,6 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.TestData;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.UsersClient;
-import guru.qa.niffler.service.impl.UsersDbClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -14,12 +13,11 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.List;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
 
-//video 6.3
+//video 6.3; 7.2 45';
 @ParametersAreNonnullByDefault
 public class UserExtension implements BeforeEachCallback, ParameterResolver {
 
@@ -46,11 +44,7 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
                         incomes,
                         outcomes
                 );
-
-                context.getStore(NAMESPACE).put(
-                        context.getUniqueId(),
-                        created.addTestData(testData)
-                );
+                setUser(created.addTestData(testData));
               }
             });
   }
@@ -64,10 +58,18 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
   @Override
   public UserJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext)
           throws ParameterResolutionException {
-    return createdUser();
+    return getUserJson();
   }
 
-  public static UserJson createdUser() {
+  public static void setUser(UserJson createdUser) {
+    final ExtensionContext context = context();
+    context.getStore(NAMESPACE).put(
+            context.getUniqueId(),
+            createdUser
+    );
+  }
+
+  public static UserJson getUserJson() {
     final ExtensionContext methodContext = context();
     return methodContext.getStore(NAMESPACE)
             .get(methodContext.getUniqueId(), UserJson.class);

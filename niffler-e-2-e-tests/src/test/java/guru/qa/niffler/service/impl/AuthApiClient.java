@@ -1,9 +1,12 @@
 package guru.qa.niffler.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.qa.niffler.api.AuthApi;
+import guru.qa.niffler.api.core.CodeInterceptor;
 import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.jupiter.extension.ApiLoginExtension;
 import guru.qa.niffler.service.RestClient;
 import guru.qa.niffler.utils.OAuthUtils;
 import lombok.SneakyThrows;
@@ -22,7 +25,7 @@ public class AuthApiClient extends RestClient {
   private final AuthApi authApi;
 
   public AuthApiClient() {
-    super(CFG.authUrl(), true, ScalarsConverterFactory.create(), HEADERS);
+    super(CFG.authUrl(), true, new CodeInterceptor());
     this.authApi = create(AuthApi.class);
   }
 
@@ -42,23 +45,20 @@ public class AuthApiClient extends RestClient {
             "S256"
     ).execute();
 
-    Response<String> loginResponse = authApi.login(
+    authApi.login(
             username,
             password,
             ThreadSafeCookieStore.INSTANCE.cookieValue("XSRF-TOKEN")
     ).execute();
 
-    String url = loginResponse.raw().request().url().toString();
-    String code = StringUtils.substringAfter(url, "code=");
-
-    Response<String> tokenResponse = authApi.token(
-            code,
+    Response<JsonNode> tokenResponse = authApi.token(
+            ApiLoginExtension.getCode(),
             redirectUri,
             clientId,
             codeVerifier,
             "authorization_code"
     ).execute();
 
-    return new ObjectMapper().readTree(tokenResponse.body().getBytes(StandardCharsets.UTF_8)).get("id_token").asText();
+    return tokenResponse.body().get("id_token").asText();
   }
 }

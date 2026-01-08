@@ -22,14 +22,14 @@ public interface AuthApi {
 
   @POST("login")
   @FormUrlEncoded
-  Call<String> login(@Field("username") String username,
+  Call<Void> login(@Field("username") String username,
                      @Field("password") String password,
                      @Field("_csrf") String csrf
   );
 
   @POST("oauth2/token")
   @FormUrlEncoded
-  Call<String> token(@Field("code") String code,
+  Call<JsonNode> token(@Field("code") String code,
                      @Field(value = "redirect_uri", encoded = true) String redirectUri,
                      @Field("client_id") String clientId,
                      @Field("code_verifier") String codeChallenge,
