@@ -10,10 +10,17 @@ public interface Config {
             : LocalConfig.INSTANCE;
   }
 
+  default String testDatabaseUsername() {
+    return "postgres";
+  }
+
+  default String testDatabasePassword() {
+    return "secret";
+  }
+
   @Nonnull String frontUrl();
   @Nonnull String spendUrl();
 
-  @Nonnull String ghUrl();
   @Nonnull String authUrl();
   @Nonnull String gatewayUrl();
   @Nonnull String userdataUrl();
@@ -22,4 +29,9 @@ public interface Config {
   @Nonnull String userdataJdbcUrl();
   @Nonnull String spendJdbcUrl();
   @Nonnull String currencyJdbcUrl();
+
+  @Nonnull
+  default String ghUrl() {
+    return "https://api.github.com/";
+  }
 }

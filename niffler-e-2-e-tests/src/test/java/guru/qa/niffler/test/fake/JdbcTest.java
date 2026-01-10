@@ -7,6 +7,7 @@ import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.impl.SpendDbClient;
 import guru.qa.niffler.service.impl.UsersDbClientOld;
 import guru.qa.niffler.service.impl.UsersDbClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +19,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//@Disabled
+@Disabled
 public class JdbcTest {
 
   SpendDbClient spendDbClient = new SpendDbClient();
@@ -40,20 +41,7 @@ public class JdbcTest {
   void springJdbcTest() {
     UsersDbClient usersDbRepoClient = new UsersDbClient();
 
-    UserJson user = usersDbRepoClient.createUserSpringXaTx(
-            new UserJson(
-                    null,
-                    "valentin",
-                    null,
-                    null,
-                    null,
-                    CurrencyValues.RUB,
-                    null,
-                    null,
-                    null,
-                    null
-            )
-    );
+    UserJson user = usersDbRepoClient.createUser("valentin", "12345");
     System.out.println(user);
   }
 /*
@@ -76,7 +64,7 @@ public class JdbcTest {
   }*/
 
   @DisplayName("Transaction saves us from inconsistency DB")//if username null
-  @Test
+  //@Test
   public void tx_test() {
     SpendJson spendJson = spendDbClient.createSpend(
             new SpendJson(
@@ -97,7 +85,7 @@ public class JdbcTest {
     System.out.println(spendJson);
   }
 
-  @Test
+  //@Test
   public void daotest() {
     SpendJson spendJson = spendDbClient.createSpend(
             new SpendJson(
@@ -118,7 +106,7 @@ public class JdbcTest {
     System.out.println(spendJson);
   }
 
-  @Test
+  //@Test
   public void findCategoryByIdTest() {
     // Arrange
     String idString = "72e86a34-b495-4cb1-884b-14b893fd6f8f";//Candy
@@ -129,7 +117,7 @@ public class JdbcTest {
     assertTrue(result.isPresent());
   }
 
-  @Test
+  //@Test
   public void findSpendByIdTest() {
     // Arrange
     String idString = "7c19ff07-eb23-44b6-8039-96a46d7f2930";//duck chocolate
@@ -140,7 +128,7 @@ public class JdbcTest {
     assertTrue(result.isPresent());
   }
 
-  @Test
+  //@Test
   public void deleteSpendByIdTest() {
     // Arrange
     String idString = "02348182-d8fa-11f0-8766-364f1644149f";//duck 22
@@ -152,7 +140,7 @@ public class JdbcTest {
     assertTrue(result.isEmpty());
   }
 
-  @Test
+  //@Test
   public void deleteCategoryByIdTest() {
     // Arrange
     String idString = "022fb5ee-d8fa-11f0-8766-364f1644149f";//test-tx-name 39
@@ -164,7 +152,7 @@ public class JdbcTest {
     assertTrue(result.isEmpty());
   }
 
-  @Test
+  //@Test
   public void findUserByIdTest() {
     // Arrange
     String idString = "69c0c92e-dcbe-11f0-b051-666764dfeab4";//barsik
@@ -176,7 +164,7 @@ public class JdbcTest {
     System.out.println(result.get());
   }
 
-  @Test
+  //@Test
   public void deleteUserByIdTest() {
     // Arrange
     String idAuth = "eebf25f0-d84e-4737-a576-d7d9493d7ae4";

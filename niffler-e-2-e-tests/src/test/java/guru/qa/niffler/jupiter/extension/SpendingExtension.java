@@ -15,14 +15,18 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static guru.qa.niffler.jupiter.extension.TestMethodContextExtension.context;
+import static java.util.Arrays.stream;
 
 //3.2 lesson 06:58 /video 6.3 1:34:07
 //3.3 1:01:29 createdCategory()
+@ParametersAreNonnullByDefault
 public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
@@ -34,30 +38,39 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
             .ifPresent(userAnno -> {
                       if (ArrayUtils.isNotEmpty(userAnno.spendings())) {
-                        final @Nullable UserJson createdUser = UserExtension.createdUser();
+                        final @Nullable UserJson createdUser = UserExtension.getUserJson();
                         final String username = createdUser != null
                                 ? createdUser.username()
                                 : userAnno.username();
 
+                        final List<CategoryJson> existingCategories = createdUser != null
+                                ? createdUser.testData().categories()
+                                : stream(CategoryExtension.createdCategory()).toList();
+
                         final List<SpendJson> result = new ArrayList<>();
                         for (Spending spendAnno : userAnno.spendings()) {
-                          if (!"".equals(username)) {
-                            SpendJson spendJson = new SpendJson(
-                                    null,
-                                    new Date(),
-                                    new CategoryJson(
-                                            null,
-                                            spendAnno.category(),
-                                            username,
-                                            false
-                                    ),
-                                    spendAnno.currency(),
-                                    spendAnno.amount(),
-                                    spendAnno.description(),
-                                    username
-                            );
-                            result.add(spendClient.createSpend(spendJson));
-                          }
+                          final Optional<CategoryJson> matchedCategory = existingCategories.stream()
+                                  .filter(cat -> cat.name().equals(spendAnno.category()))
+                                  .findFirst();
+
+                          SpendJson spend = new SpendJson(
+                                  null,
+                                  new Date(),
+                                  matchedCategory.orElseGet(() -> new CategoryJson(
+                                          null,
+                                          spendAnno.category(),
+                                          username,
+                                          false
+                                  )),
+                                  spendAnno.currency(),
+                                  spendAnno.amount(),
+                                  spendAnno.description(),
+                                  username
+                          );
+
+                          result.add(
+                                  spendClient.createSpend(spend)
+                          );
                         }
 
                         if (createdUser != null) {

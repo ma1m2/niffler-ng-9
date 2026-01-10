@@ -6,6 +6,7 @@ import java.net.HttpCookie;
 import java.net.URI;
 import java.util.List;
 
+//video 7.2
 public enum ThreadSafeCookieStore implements CookieStore {
   INSTANCE;
 

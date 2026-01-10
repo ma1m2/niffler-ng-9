@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
 
 //add from 3.3 1:01:01 createdCategory()
 //hw 3.3 /video 6.3 1:27:01, 1:51:20
+@ParametersAreNonnullByDefault
 public class CategoryExtension implements
         BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
@@ -35,14 +37,18 @@ public class CategoryExtension implements
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
             .ifPresent(userAnno -> {
               if (ArrayUtils.isNotEmpty(userAnno.categories())) {
-                final @Nullable UserJson createdUser = UserExtension.createdUser();
+                final @Nullable UserJson createdUser = UserExtension.getUserJson();
+
+                final String username = createdUser != null
+                        ? createdUser.username()
+                        : userAnno.username();
 
                 final List<CategoryJson> result = new ArrayList<>();
                 for (Category categoryAnno : userAnno.categories()) {
                   CategoryJson category = new CategoryJson(
                           null,
                           "".equals(categoryAnno.name()) ? randomCategoryName() : categoryAnno.name(),
-                          userAnno.username(),
+                          username,
                           categoryAnno.archived()
                   );
 

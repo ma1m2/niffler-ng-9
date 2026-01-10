@@ -3,16 +3,11 @@ package guru.qa.niffler.page;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
-import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.awt.image.BufferedImage;
 
-import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.attributeMatching;
 import static com.codeborne.selenide.Condition.disabled;
 import static com.codeborne.selenide.Condition.text;
@@ -20,6 +15,7 @@ import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
+import static guru.qa.niffler.condition.ScreenshotConditions.image;
 
 @ParametersAreNonnullByDefault
 public class ProfilePage extends BasePage<ProfilePage> {
@@ -90,12 +86,8 @@ public class ProfilePage extends BasePage<ProfilePage> {
 
   @Step("Check photo")
   @Nonnull
-  public ProfilePage checkPhoto(String path) throws IOException {
-    final byte[] photoContent;
-    try (InputStream is = new ClassPathResource(path).getInputStream()) {
-      photoContent = Base64.getEncoder().encode(is.readAllBytes());
-    }
-    avatar.should(attribute("src", new String(photoContent, StandardCharsets.UTF_8)));
+  public ProfilePage checkPhoto(BufferedImage expected) {
+    avatar.shouldHave(image(expected));
     return this;
   }
 

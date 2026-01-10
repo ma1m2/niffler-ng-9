@@ -6,10 +6,13 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
+import org.junit.platform.commons.support.SearchOption;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 //3.2 video 26:00, SpendingTest, LoginTest
+@ParametersAreNonnullByDefault
 public class IssueExtension implements ExecutionCondition {
 
   private final GhApiClient ghApiClient = new GhApiClient();
@@ -21,7 +24,7 @@ public class IssueExtension implements ExecutionCondition {
     annotation = AnnotationSupport.findAnnotation(
             context.getRequiredTestClass(),
             DisableByIssue.class,
-            context.getEnclosingTestClasses()
+            SearchOption.INCLUDE_ENCLOSING_CLASSES
     );
 
     if (context.getTestMethod().isPresent() && annotation.isEmpty()) {

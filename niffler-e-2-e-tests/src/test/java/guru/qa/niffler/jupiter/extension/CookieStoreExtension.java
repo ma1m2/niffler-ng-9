@@ -4,6 +4,10 @@ import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+//video 7.2
+@ParametersAreNonnullByDefault
 public class CookieStoreExtension implements AfterTestExecutionCallback {
   @Override
   public void afterTestExecution(ExtensionContext context) throws Exception {
