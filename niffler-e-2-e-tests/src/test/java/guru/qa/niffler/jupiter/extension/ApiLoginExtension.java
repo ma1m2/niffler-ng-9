@@ -6,13 +6,11 @@ import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Token;
-import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.TestData;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.service.impl.AuthApiClient;
-import guru.qa.niffler.utils.RandomDataUtils;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -21,14 +19,14 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
-//video 11.2
+//video 11.2, 11.3
 @ParametersAreNonnullByDefault
-public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver {
+public class ApiLoginExtension implements BeforeTestExecutionCallback, ParameterResolver {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ApiLoginExtension.class);
   private static Config CFG = Config.getInstance();
+
   private final AuthApiClient authApiClient = new AuthApiClient();
   private final boolean setupBrowser;
 
@@ -40,12 +38,12 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
     this.setupBrowser = true;
   }
 
-  public static ApiLoginExtension restApiLoginExtension(){
+  public static ApiLoginExtension rest(){
     return new ApiLoginExtension(false);
   }
 
   @Override
-  public void beforeEach(ExtensionContext context) throws Exception {
+  public void beforeTestExecution(ExtensionContext context) throws Exception {
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), ApiLogin.class)
             .ifPresent(apiLogin -> {
               final UserJson userToLogin;
@@ -78,10 +76,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                 Selenide.open(CFG.frontUrl());
                 Selenide.localStorage().setItem("id_token", getToken());
                 WebDriverRunner.getWebDriver().manage().addCookie(
-                        new Cookie(
-                                "JSESSIONID",
-                                ThreadSafeCookieStore.INSTANCE.cookieValue("JSESSIONID")
-                        )
+                        getJsessionIdCookie()
                 );
                 Selenide.open(MainPage.URL, MainPage.class).checkThatPageLoaded();
               }
@@ -96,7 +91,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
 
   @Override
   public String resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return getToken();
+    return "Bearer " + getToken();
   }
 
   public static void setToken(String token) {
