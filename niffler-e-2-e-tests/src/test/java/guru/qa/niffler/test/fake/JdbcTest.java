@@ -41,20 +41,7 @@ public class JdbcTest {
   void springJdbcTest() {
     UsersDbClient usersDbRepoClient = new UsersDbClient();
 
-    UserJson user = usersDbRepoClient.createUserSpringXaTx(
-            new UserJson(
-                    null,
-                    "valentin",
-                    null,
-                    null,
-                    null,
-                    CurrencyValues.RUB,
-                    null,
-                    null,
-                    null,
-                    null
-            )
-    );
+    UserJson user = usersDbRepoClient.createUser("valentin", "12345");
     System.out.println(user);
   }
 /*

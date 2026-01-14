@@ -17,7 +17,6 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +38,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
             .ifPresent(userAnno -> {
                       if (ArrayUtils.isNotEmpty(userAnno.spendings())) {
-                        final @Nullable UserJson createdUser = UserExtension.createdUser();
+                        final @Nullable UserJson createdUser = UserExtension.getUserJson();
                         final String username = createdUser != null
                                 ? createdUser.username()
                                 : userAnno.username();

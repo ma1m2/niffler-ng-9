@@ -26,4 +26,7 @@ public interface UsersClient {
 
   @Nonnull
   List<UserJson> addFriend(UserJson targetUser, int count);
+
+  @Nonnull
+  List<UserJson> addOtherPeoples(int count);
 }

@@ -34,9 +34,7 @@ public interface UserdataUserRepository {
   @Nonnull
   UserEntity update(UserEntity user);
 
-  void addIncomeInvitation(UserEntity requester, UserEntity addressee);
-
-  void addOutcomeInvitation(UserEntity requester, UserEntity addressee);
+  void addFriendshipRequest(UserEntity requester, UserEntity addressee);
 
   void addFriend(UserEntity requester, UserEntity addressee);
 

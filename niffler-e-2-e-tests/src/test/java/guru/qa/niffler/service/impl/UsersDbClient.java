@@ -5,19 +5,21 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
+import guru.qa.niffler.data.jdbc.DataSources;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
-import guru.qa.niffler.data.repository.impl.AuthUserRepositoryHibernate;
-import guru.qa.niffler.data.repository.impl.UserdataUserRepositoryHibernate;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
+import guru.qa.niffler.jupiter.extension.UserExtension;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.FriendshipStatus;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.utils.RandomDataUtils;
 import io.qameta.allure.Step;
+import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -26,14 +28,24 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
+import static java.util.Objects.requireNonNull;
+
 //video 6.1-6.2
 @ParametersAreNonnullByDefault
 public class UsersDbClient implements UsersClient {
+
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-  private final AuthUserRepository authUserRepo = AuthUserRepository.getInstance();
-  private final UserdataUserRepository userdataUserRepo = UserdataUserRepository.getInstance();
+  private final AuthUserRepository authUserRepository = AuthUserRepository.getInstance();
+  private final UserdataUserRepository userdataUserRepository = UserdataUserRepository.getInstance();
+
+  private final TransactionTemplate txTemplate = new TransactionTemplate(
+          new JdbcTransactionManager(
+                  DataSources.dataSource(CFG.authJdbcUrl())
+          )
+  );
 
   private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
           CFG.authJdbcUrl(),
@@ -42,14 +54,13 @@ public class UsersDbClient implements UsersClient {
 
   @Nonnull
   @Override
-  @Step("Create user using SQL")
+  @Step("Create user with username '{0}' using SQL INSERT")
   public UserJson createUser(String username, String password) {
-    return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
+    return requireNonNull(xaTransactionTemplate.execute(() -> {
               AuthUserEntity authUser = authUserEntity(username, password);
-              authUserRepo.create(authUser);
-
+              authUserRepository.create(authUser);
               return UserJson.fromEntity(
-                      userdataUserRepo.create(userEntity(username)),
+                      userdataUserRepository.create(userEntity(username)),
                       null
               );
             }
@@ -57,20 +68,23 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Nonnull
+  @Override
+  @Step("Add {1} income invitation(s) for user using SQL INSERT")
   public List<UserJson> addIncomeInvitation(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
-      UserEntity targetEntity = userdataUserRepo.findById(targetUser.id()).orElseThrow();
-
+      UserEntity targetEntity = userdataUserRepository.findById(
+              targetUser.id()
+      ).orElseThrow();
       for (int i = 0; i < count; i++) {
         xaTransactionTemplate.execute(() -> {
-                  String username = RandomDataUtils.randomUsername();
-                  AuthUserEntity authUser = authUserEntity(username, "12345");
-                  authUserRepo.create(authUser);
-                  UserEntity addressee = userdataUserRepo.create(userEntity(username));
-                  userdataUserRepo.addIncomeInvitation(targetEntity, addressee);
+                  String username = randomUsername();
+                  AuthUserEntity authUser = authUserEntity(username, UserExtension.DEFAULT_PASSWORD);
+                  authUserRepository.create(authUser);
+                  UserEntity adressee = userdataUserRepository.create(userEntity(username));
+                  userdataUserRepository.addFriendshipRequest(adressee, targetEntity);
                   result.add(UserJson.fromEntity(
-                          addressee,
+                          adressee,
                           FriendshipStatus.INVITE_RECEIVED
                   ));
                   return null;
@@ -82,20 +96,24 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Nonnull
-  public List<UserJson>  addOutcomeInvitation(UserJson targetUser, int count) {
+  @Override
+  @Step("Add {1} outcome invitation(s) for user using SQL INSERT")
+  public List<UserJson> addOutcomeInvitation(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
-      UserEntity targetEntity = userdataUserRepo.findById(targetUser.id()).orElseThrow();
+      UserEntity targetEntity = userdataUserRepository.findById(
+              targetUser.id()
+      ).orElseThrow();
 
       for (int i = 0; i < count; i++) {
         xaTransactionTemplate.execute(() -> {
-                  String username = RandomDataUtils.randomUsername();
-                  AuthUserEntity authUser = authUserEntity(username, "12345");
-                  authUserRepo.create(authUser);
-                  UserEntity addressee = userdataUserRepo.create(userEntity(username));
-                  userdataUserRepo.addOutcomeInvitation(targetEntity, addressee);
+                  String username = randomUsername();
+                  AuthUserEntity authUser = authUserEntity(username, UserExtension.DEFAULT_PASSWORD);
+                  authUserRepository.create(authUser);
+                  UserEntity adressee = userdataUserRepository.create(userEntity(username));
+                  userdataUserRepository.addFriendshipRequest(targetEntity, adressee);
                   result.add(UserJson.fromEntity(
-                          addressee,
+                          adressee,
                           FriendshipStatus.INVITE_RECEIVED
                   ));
                   return null;
@@ -107,20 +125,24 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Nonnull
-  public List<UserJson>  addFriend(UserJson targetUser, int count) {
+  @Override
+  @Step("Add {1} friend(s) for user using SQL INSERT")
+  public List<UserJson> addFriend(UserJson targetUser, int count) {
     final List<UserJson> result = new ArrayList<>();
     if (count > 0) {
-      UserEntity targetEntity = userdataUserRepo.findById(targetUser.id()).orElseThrow();
+      UserEntity targetEntity = userdataUserRepository.findById(
+              targetUser.id()
+      ).orElseThrow();
 
       for (int i = 0; i < count; i++) {
         xaTransactionTemplate.execute(() -> {
-                  String username = RandomDataUtils.randomUsername();
-                  AuthUserEntity authUser = authUserEntity(username, "12345");
-                  authUserRepo.create(authUser);
-                  UserEntity addressee = userdataUserRepo.create(userEntity(username));
-                  userdataUserRepo.addFriend(targetEntity, addressee);
+                  String username = randomUsername();
+                  AuthUserEntity authUser = authUserEntity(username, UserExtension.DEFAULT_PASSWORD);
+                  authUserRepository.create(authUser);
+                  UserEntity adressee = userdataUserRepository.create(userEntity(username));
+                  userdataUserRepository.addFriend(targetEntity, adressee);
                   result.add(UserJson.fromEntity(
-                          addressee,
+                          adressee,
                           FriendshipStatus.FRIEND
                   ));
                   return null;
@@ -132,62 +154,53 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Nonnull
-  public UserJson createUserSpringXaTx(UserJson user) {
-    return Objects.requireNonNull(xaTransactionTemplate.execute(() -> {
-              AuthUserEntity authUser = authUserEntity(user);
-              authUserRepo.create(authUser);
-
-              return UserJson.fromEntity(
-                      userdataUserRepo.create(UserEntity.fromJson(user)),
-                      null
-              );
-            }
-    ));
+  @Override
+  @Step("Add {0} other people(s) for user using SQL INSERT")
+  public List<UserJson> addOtherPeoples(int count) {
+    final List<UserJson> result = new ArrayList<>();
+    if (count > 0) {
+      for (int i = 0; i < count; i++) {
+        xaTransactionTemplate.execute(() -> {
+                  String username = randomUsername();
+                  authUserRepository.create(authUserEntity(username, UserExtension.DEFAULT_PASSWORD));
+                  UserEntity other = userdataUserRepository.create(userEntity(username));
+                  result.add(UserJson.fromEntity(
+                          other,
+                          null
+                  ));
+                  return null;
+                }
+        );
+      }
+    }
+    return result;
   }
 
-  @Nonnull
-  private static UserEntity userEntity(String username) {
+  private UserEntity userEntity(String username) {
     UserEntity ue = new UserEntity();
     ue.setUsername(username);
     ue.setCurrency(CurrencyValues.RUB);
     return ue;
   }
 
-  private @Nonnull AuthUserEntity authUserEntity(String username, String password) {
+  private AuthUserEntity authUserEntity(String username, String password) {
     AuthUserEntity authUser = new AuthUserEntity();
     authUser.setUsername(username);
-    authUser.setPassword(pe.encode("12345"));
+    authUser.setPassword(pe.encode(password));
     authUser.setEnabled(true);
     authUser.setAccountNonExpired(true);
     authUser.setAccountNonLocked(true);
     authUser.setCredentialsNonExpired(true);
-    authUser.setAuthorities(Arrays.stream(Authority.values()).map(
-            e -> {
-              AuthorityEntity ae = new AuthorityEntity();
-              ae.setUser(authUser);
-              ae.setAuthority(e);
-              return ae;
-            }
-    ).toList());
-    return authUser;
-  }
-
-  private @Nonnull AuthUserEntity authUserEntity(UserJson user) {
-    AuthUserEntity authUser = new AuthUserEntity();
-    authUser.setUsername(user.username());
-    authUser.setPassword(pe.encode("12345"));
-    authUser.setEnabled(true);
-    authUser.setAccountNonExpired(true);
-    authUser.setAccountNonLocked(true);
-    authUser.setCredentialsNonExpired(true);
-    authUser.setAuthorities(Arrays.stream(Authority.values()).map(
-            e -> {
-              AuthorityEntity ae = new AuthorityEntity();
-              ae.setUser(authUser);
-              ae.setAuthority(e);
-              return ae;
-            }
-    ).toList());
+    authUser.setAuthorities(
+            Arrays.stream(Authority.values()).map(
+                    e -> {
+                      AuthorityEntity ae = new AuthorityEntity();
+                      ae.setUser(authUser);
+                      ae.setAuthority(e);
+                      return ae;
+                    }
+            ).toList()
+    );
     return authUser;
   }
 }
