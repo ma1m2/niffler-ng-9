@@ -1,9 +1,11 @@
 package guru.qa.niffler.test.fake;
 
+import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.extension.ClientResolver;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.SpendClient;
 import guru.qa.niffler.service.UsersClient;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -15,18 +17,21 @@ public class FactoryMethodTest {
   private SpendClient spendClient;
   private UsersClient usersClient;
 
-  @ValueSource(strings = {
-          "valentin-6"
+/*  @ValueSource(strings = {
+          "valentin-8"
   })
-  @ParameterizedTest
-  void springJdbcTest(String uname) {
-    UserJson user = usersClient.createUser(
-            uname,
+  @ParameterizedTest*/
+  @User
+  @Test
+  void springJdbcTest(UserJson user) {
+    UserJson newUser = usersClient.createUser(
+            user.username(),
             "12345"
     );
+    System.out.println(newUser);
 
-    usersClient.addIncomeInvitation(user, 1);
-    usersClient.addOutcomeInvitation(user, 1);
-    usersClient.addFriend(user, 1);
+    usersClient.addIncomeInvitation(newUser, 1);
+    usersClient.addOutcomeInvitation(newUser, 1);
+    usersClient.addFriend(newUser, 1);
   }
 }

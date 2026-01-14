@@ -13,9 +13,11 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.ByteArrayInputStream;
 
 //3.1 lesson 25:30
+@ParametersAreNonnullByDefault
 public class BrowserExtension implements
         BeforeEachCallback,
         AfterEachCallback,
