@@ -153,4 +153,20 @@ public class SpendDbClient implements SpendClient {
             )
     );
   }
+
+  public void deleteSpend(UUID id) {
+    throw new UnsupportedOperationException();
+  }
+
+  public void deleteCategory(UUID id) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Optional<SpendJson> findSpendById(UUID id) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Optional<CategoryJson> findCategoryById(UUID id) {
+    throw new UnsupportedOperationException();
+  }
 }
