@@ -7,6 +7,7 @@ build
 !**/src/main/**/build/
 !**/src/test/**/build/
 logs/
+niffler-e-2-e-tests/tmlog*
 
 ### STS ###
 .apt_generated
