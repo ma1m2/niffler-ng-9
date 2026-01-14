@@ -39,12 +39,16 @@ public class CategoryExtension implements
               if (ArrayUtils.isNotEmpty(userAnno.categories())) {
                 final @Nullable UserJson createdUser = UserExtension.createdUser();
 
+                final String username = createdUser != null
+                        ? createdUser.username()
+                        : userAnno.username();
+
                 final List<CategoryJson> result = new ArrayList<>();
                 for (Category categoryAnno : userAnno.categories()) {
                   CategoryJson category = new CategoryJson(
                           null,
                           "".equals(categoryAnno.name()) ? randomCategoryName() : categoryAnno.name(),
-                          userAnno.username(),
+                          username,
                           categoryAnno.archived()
                   );
 

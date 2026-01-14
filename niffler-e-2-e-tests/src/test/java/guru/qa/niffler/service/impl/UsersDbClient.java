@@ -32,8 +32,8 @@ public class UsersDbClient implements UsersClient {
   private static final Config CFG = Config.getInstance();
   private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-  private final AuthUserRepository authUserRepo = new AuthUserRepositoryHibernate();
-  private final UserdataUserRepository userdataUserRepo = new UserdataUserRepositoryHibernate();
+  private final AuthUserRepository authUserRepo = AuthUserRepository.getInstance();
+  private final UserdataUserRepository userdataUserRepo = UserdataUserRepository.getInstance();
 
   private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
           CFG.authJdbcUrl(),

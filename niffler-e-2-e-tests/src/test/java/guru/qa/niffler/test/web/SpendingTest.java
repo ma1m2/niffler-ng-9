@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
@@ -11,11 +12,11 @@ import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.utils.RandomDataUtils;
 import guru.qa.niffler.utils.ScreenDiffResult;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -128,8 +129,7 @@ public class SpendingTest {
   void checkStatComponentOldTest(UserJson user, BufferedImage expected) throws IOException {
     Selenide.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
-            .submit(new MainPage())
-            .checkThatPageLoaded();
+            .submit(new MainPage());
 
     Selenide.sleep(3000);
 
@@ -147,35 +147,58 @@ public class SpendingTest {
                   amount = 79990
           )
   )
-  @ScreenShotTest("img/expected-stat.png")
+  @ScreenShotTest("img/expected-stat.png")//bad-expected-stat.png
   void checkStatComponentTest(UserJson user, BufferedImage expected) throws IOException {
     Selenide.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent()
             .checkStatisticBubblesContains("Обучение 79990 ₽")
-            .checkStatisticImage(expected);
+            .checkStatisticImage(expected)
+            .checkBubbles(Color.yellow);
+  }
+
+  @User(
+          spendings = {
+                  @Spending(
+                  category = "Обучение",
+                  description = "Обучение Advanced 2.0",
+                  amount = 79990),
+                  @Spending(
+                  category = "Поездки",
+                  description = "В Москву",
+                  amount = 1000)
+          }
+  )
+  @Test
+  void checkBubbleStatComponentTest(@NotNull UserJson user){
+    Selenide.open(LoginPage.URL, LoginPage.class)
+            .fillLoginPage(user.username(), user.testData().password())
+            .submit(new MainPage())
+            .getStatComponent()
+            .checkStatisticBubblesContains("Обучение 79990 ₽", "Поездки 1000 ₽")
+            .checkBubbles(Color.yellow, Color.green);
   }
 
   @User(
           categories = {
-                  @Category(name = "Поездки"),
-                  @Category(name = "Ремонт", archived = true),
-                  @Category(name = "Страховка", archived = true)
+                  @Category(name = "Traveling"),
+                  @Category(name = "Repair", archived = true),
+                  @Category(name = "Insure", archived = true)
           },
           spendings = {
                   @Spending(
-                          category = "Поездки",
+                          category = "Traveling",
                           description = "В Москву",
                           amount = 9500
                   ),
                   @Spending(
-                          category = "Ремонт",
+                          category = "Repair",
                           description = "Цемент",
                           amount = 100
                   ),
                   @Spending(
-                          category = "Страховка",
+                          category = "Insure",
                           description = "ОСАГО",
                           amount = 3000
                   )
@@ -183,11 +206,12 @@ public class SpendingTest {
   )
   @ScreenShotTest(value = "img/expected-stat-archived.png")
   void statComponentShouldDisplayArchivedCategories(UserJson user, BufferedImage expected) throws IOException {
+    System.out.println("## " + user.username());
     Selenide.open(LoginPage.URL, LoginPage.class)
             .fillLoginPage(user.username(), user.testData().password())
             .submit(new MainPage())
             .getStatComponent()
-            .checkStatisticBubblesContains("Поездки 9500 ₽", "Archived 3100 ₽")
+            .checkStatisticBubblesContains("Traveling 9500 ₽", "Archived 3100 ₽")
             .checkStatisticImage(expected);
   }
 }
