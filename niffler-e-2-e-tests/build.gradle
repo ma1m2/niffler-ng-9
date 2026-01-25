@@ -5,6 +5,7 @@ buildscript {
         selenideVersion = '7.9.3'
         okhttp3Version = '4.12.0'
         retrofitVersion = '2.11.0'
+        apollographqlVersion = '0.0.2'
         logbackVersion = '1.4.11'
         slf4jVersion = '2.0.9'
         springJdbcVersion = '6.2.6'
@@ -77,6 +78,7 @@ sourceSets {
         java {
             srcDir('src/test/java')
             srcDir("$buildDir/generated-sources/test/xjc")
+            srcDir("$buildDir/generated/source/apollo/niffler")
         }
     }
 }
@@ -129,6 +131,10 @@ dependencies {
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'com.github.vertical-blank:sql-formatter:2.0.5'
     testImplementation 'com.github.h-thurow:simple-jndi:0.25.0'
+    // GraphQL
+    testImplementation "com.apollographql.java:client:${apollographqlVersion}"
+    testImplementation "com.apollographql.java:rx2:${apollographqlVersion}"
+    testImplementation 'com.apollographql.adapters:apollo-adapters-core:0.0.4'
     // gRPC
     testImplementation "io.grpc:grpc-api:${project.ext.grpcVersion}"
     testImplementation "io.grpc:grpc-stub:${project.ext.grpcVersion}"
@@ -158,4 +164,8 @@ tasks.register('printVersion') {
     doLast {
         println project.version
     }
+}
+
+tasks.named { it == "generateNifflerApolloSources" }.configureEach {
+    dependsOn("downloadNifflerApolloSchemaFromIntrospection")
 }
