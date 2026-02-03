@@ -31,6 +31,13 @@ public interface Config {
   @Nonnull String currencyJdbcUrl();
 
   @Nonnull
+  String currencyGrpcAddress();
+
+  default int currencyGrpcPort() {
+    return 8099;
+  }
+
+  @Nonnull
   default String ghUrl() {
     return "https://api.github.com/";
   }
