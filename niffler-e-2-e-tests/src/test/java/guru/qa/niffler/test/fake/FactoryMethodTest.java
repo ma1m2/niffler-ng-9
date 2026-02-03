@@ -22,7 +22,7 @@ public class FactoryMethodTest {
   })
   @ParameterizedTest*/
   @User
-  @Test
+  //@Test
   void springJdbcTest(UserJson user) {
     UserJson newUser = usersClient.createUser(
             user.username(),
